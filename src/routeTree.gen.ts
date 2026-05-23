@@ -17,7 +17,11 @@ import { Route as AvisoDePrivacidadRouteImport } from './routes/aviso-de-privaci
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ValidarFolioRouteImport } from './routes/validar.$folio'
+import { Route as AuthenticatedTablasRouteImport } from './routes/_authenticated.tablas'
+import { Route as AuthenticatedExpedientesRouteImport } from './routes/_authenticated.expedientes'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
+import { Route as AuthenticatedContratosRouteImport } from './routes/_authenticated.contratos'
+import { Route as AuthenticatedConfiguracionRouteImport } from './routes/_authenticated.configuracion'
 
 const TerminosYCondicionesRoute = TerminosYCondicionesRouteImport.update({
   id: '/terminos-y-condiciones',
@@ -58,11 +62,33 @@ const ValidarFolioRoute = ValidarFolioRouteImport.update({
   path: '/validar/$folio',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedTablasRoute = AuthenticatedTablasRouteImport.update({
+  id: '/tablas',
+  path: '/tablas',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedExpedientesRoute =
+  AuthenticatedExpedientesRouteImport.update({
+    id: '/expedientes',
+    path: '/expedientes',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedContratosRoute = AuthenticatedContratosRouteImport.update({
+  id: '/contratos',
+  path: '/contratos',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedConfiguracionRoute =
+  AuthenticatedConfiguracionRouteImport.update({
+    id: '/configuracion',
+    path: '/configuracion',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -71,7 +97,11 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terminos-y-condiciones': typeof TerminosYCondicionesRoute
+  '/configuracion': typeof AuthenticatedConfiguracionRoute
+  '/contratos': typeof AuthenticatedContratosRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/expedientes': typeof AuthenticatedExpedientesRoute
+  '/tablas': typeof AuthenticatedTablasRoute
   '/validar/$folio': typeof ValidarFolioRoute
 }
 export interface FileRoutesByTo {
@@ -81,7 +111,11 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terminos-y-condiciones': typeof TerminosYCondicionesRoute
+  '/configuracion': typeof AuthenticatedConfiguracionRoute
+  '/contratos': typeof AuthenticatedContratosRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/expedientes': typeof AuthenticatedExpedientesRoute
+  '/tablas': typeof AuthenticatedTablasRoute
   '/validar/$folio': typeof ValidarFolioRoute
 }
 export interface FileRoutesById {
@@ -93,7 +127,11 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terminos-y-condiciones': typeof TerminosYCondicionesRoute
+  '/_authenticated/configuracion': typeof AuthenticatedConfiguracionRoute
+  '/_authenticated/contratos': typeof AuthenticatedContratosRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/expedientes': typeof AuthenticatedExpedientesRoute
+  '/_authenticated/tablas': typeof AuthenticatedTablasRoute
   '/validar/$folio': typeof ValidarFolioRoute
 }
 export interface FileRouteTypes {
@@ -105,7 +143,11 @@ export interface FileRouteTypes {
     | '/login'
     | '/sitemap.xml'
     | '/terminos-y-condiciones'
+    | '/configuracion'
+    | '/contratos'
     | '/dashboard'
+    | '/expedientes'
+    | '/tablas'
     | '/validar/$folio'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -115,7 +157,11 @@ export interface FileRouteTypes {
     | '/login'
     | '/sitemap.xml'
     | '/terminos-y-condiciones'
+    | '/configuracion'
+    | '/contratos'
     | '/dashboard'
+    | '/expedientes'
+    | '/tablas'
     | '/validar/$folio'
   id:
     | '__root__'
@@ -126,7 +172,11 @@ export interface FileRouteTypes {
     | '/login'
     | '/sitemap.xml'
     | '/terminos-y-condiciones'
+    | '/_authenticated/configuracion'
+    | '/_authenticated/contratos'
     | '/_authenticated/dashboard'
+    | '/_authenticated/expedientes'
+    | '/_authenticated/tablas'
     | '/validar/$folio'
   fileRoutesById: FileRoutesById
 }
@@ -199,6 +249,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ValidarFolioRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/tablas': {
+      id: '/_authenticated/tablas'
+      path: '/tablas'
+      fullPath: '/tablas'
+      preLoaderRoute: typeof AuthenticatedTablasRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/expedientes': {
+      id: '/_authenticated/expedientes'
+      path: '/expedientes'
+      fullPath: '/expedientes'
+      preLoaderRoute: typeof AuthenticatedExpedientesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -206,15 +270,37 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/contratos': {
+      id: '/_authenticated/contratos'
+      path: '/contratos'
+      fullPath: '/contratos'
+      preLoaderRoute: typeof AuthenticatedContratosRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/configuracion': {
+      id: '/_authenticated/configuracion'
+      path: '/configuracion'
+      fullPath: '/configuracion'
+      preLoaderRoute: typeof AuthenticatedConfiguracionRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedConfiguracionRoute: typeof AuthenticatedConfiguracionRoute
+  AuthenticatedContratosRoute: typeof AuthenticatedContratosRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedExpedientesRoute: typeof AuthenticatedExpedientesRoute
+  AuthenticatedTablasRoute: typeof AuthenticatedTablasRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedConfiguracionRoute: AuthenticatedConfiguracionRoute,
+  AuthenticatedContratosRoute: AuthenticatedContratosRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedExpedientesRoute: AuthenticatedExpedientesRoute,
+  AuthenticatedTablasRoute: AuthenticatedTablasRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
