@@ -79,6 +79,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:site_name", content: "Impulso Go" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:title", content: "Impulso Go — Financiamiento formal en línea" },
+      { name: "twitter:title", content: "Impulso Go — Financiamiento formal en línea" },
+      { property: "og:description", content: "SOFOM E.N.R. con contrato electrónico, firma con folio y tasa fija anual del 7%." },
+      { name: "twitter:description", content: "SOFOM E.N.R. con contrato electrónico, firma con folio y tasa fija anual del 7%." },
     ],
     links: [
       {
