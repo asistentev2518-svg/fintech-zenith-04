@@ -72,14 +72,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Impulso Go — Financiamiento formal en línea" },
+      { name: "description", content: "SOFOM E.N.R. con contrato electrónico, firma con folio y tasa fija anual del 7%." },
+      { name: "author", content: "Impulso Go" },
+      { name: "theme-color", content: "#06245C" },
+      { property: "og:site_name", content: "Impulso Go" },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       {
