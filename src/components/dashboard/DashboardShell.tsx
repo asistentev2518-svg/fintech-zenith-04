@@ -16,11 +16,11 @@ import {
 import { INSTITUTION } from "@/lib/config";
 
 const navItems = [
-  { to: "/dashboard", label: "Resumen", icon: LayoutDashboard },
-  { to: "/dashboard/expedientes", label: "Expedientes", icon: FolderArchive },
-  { to: "/dashboard/contratos", label: "Contratos", icon: FileSignature },
-  { to: "/dashboard/tablas", label: "Tablas de montos", icon: TableProperties },
-  { to: "/dashboard/configuracion", label: "Configuración", icon: Settings },
+  { to: "/dashboard", label: "Resumen", icon: LayoutDashboard, ready: true },
+  { to: "/dashboard/expedientes", label: "Expedientes", icon: FolderArchive, ready: false },
+  { to: "/dashboard/contratos", label: "Contratos", icon: FileSignature, ready: false },
+  { to: "/dashboard/tablas", label: "Tablas de montos", icon: TableProperties, ready: false },
+  { to: "/dashboard/configuracion", label: "Configuración", icon: Settings, ready: false },
 ];
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
