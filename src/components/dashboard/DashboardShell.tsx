@@ -17,10 +17,10 @@ import { INSTITUTION } from "@/lib/config";
 
 const navItems = [
   { to: "/dashboard", label: "Resumen", icon: LayoutDashboard, ready: true },
-  { to: "/dashboard/expedientes", label: "Expedientes", icon: FolderArchive, ready: false },
-  { to: "/dashboard/contratos", label: "Contratos", icon: FileSignature, ready: false },
-  { to: "/dashboard/tablas", label: "Tablas de montos", icon: TableProperties, ready: false },
-  { to: "/dashboard/configuracion", label: "Configuración", icon: Settings, ready: false },
+  { to: "/expedientes", label: "Expedientes", icon: FolderArchive, ready: true },
+  { to: "/contratos", label: "Contratos", icon: FileSignature, ready: true },
+  { to: "/tablas", label: "Tablas de montos", icon: TableProperties, ready: true },
+  { to: "/configuracion", label: "Configuración", icon: Settings, ready: true },
 ];
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
@@ -94,7 +94,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             return item.ready ? (
               <Link
                 key={item.to}
-                to="/dashboard"
+                to={item.to as string}
                 onClick={() => setOpen(false)}
                 className={className}
               >
