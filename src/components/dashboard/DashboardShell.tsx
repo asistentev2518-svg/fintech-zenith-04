@@ -72,23 +72,44 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             const active =
               pathname === item.to ||
               (item.to !== "/dashboard" && pathname.startsWith(item.to));
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                onClick={() => setOpen(false)}
-                className={`group flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-semibold transition ${
-                  active
-                    ? "bg-surface text-institutional"
-                    : "text-muted-foreground hover:bg-accent hover:text-foreground"
-                }`}
-              >
+            const className = `group flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-semibold transition ${
+              active
+                ? "bg-surface text-institutional"
+                : "text-muted-foreground hover:bg-accent hover:text-foreground"
+            }`;
+            const inner = (
+              <>
                 <item.icon
                   className={`h-4 w-4 ${active ? "text-action" : "text-muted-foreground group-hover:text-foreground"}`}
                 />
                 {item.label}
-                {active && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-action" />}
+                {!item.ready && (
+                  <span className="ml-auto rounded-full bg-surface px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-action">
+                    Pronto
+                  </span>
+                )}
+                {active && item.ready && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-action" />}
+              </>
+            );
+            return item.ready ? (
+              <Link
+                key={item.to}
+                to="/dashboard"
+                onClick={() => setOpen(false)}
+                className={className}
+              >
+                {inner}
               </Link>
+            ) : (
+              <button
+                key={item.to}
+                type="button"
+                onClick={() => setOpen(false)}
+                className={`${className} cursor-not-allowed opacity-70`}
+                disabled
+              >
+                {inner}
+              </button>
             );
           })}
         </nav>
