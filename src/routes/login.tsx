@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { ShieldCheck, Lock, ArrowRight } from "lucide-react";
 import { ASSETS, INSTITUTION } from "@/lib/config";
+import { login as doLogin } from "@/lib/auth";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -16,7 +17,7 @@ export const Route = createFileRoute("/login")({
 
 function LoginPage() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const [operatorId, setOperatorId] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -25,13 +26,18 @@ function LoginPage() {
     e.preventDefault();
     setError(null);
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 600));
-    if (!email || !password) {
-      setError("Ingresa usuario y contraseña.");
+    await new Promise((r) => setTimeout(r, 450));
+    if (!operatorId || !password) {
+      setError("Ingresa tu ID y contraseña.");
       setLoading(false);
       return;
     }
-    sessionStorage.setItem("ig.session", JSON.stringify({ email, at: Date.now() }));
+    const session = doLogin(operatorId.trim(), password);
+    if (!session) {
+      setError("Credenciales inválidas. Verifica tu ID y contraseña.");
+      setLoading(false);
+      return;
+    }
     navigate({ to: "/dashboard" });
   };
 
@@ -90,15 +96,15 @@ function LoginPage() {
           </p>
 
           <form onSubmit={onSubmit} className="mt-8 space-y-5">
-            <Field label="Correo corporativo" htmlFor="email">
+            <Field label="ID de operador" htmlFor="operator">
               <input
-                id="email"
-                type="email"
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                id="operator"
+                type="text"
+                autoComplete="username"
+                value={operatorId}
+                onChange={(e) => setOperatorId(e.target.value)}
                 className="h-11 w-full rounded-md border border-border bg-card px-3.5 text-sm text-foreground outline-none transition focus:border-action focus:ring-4 focus:ring-action/15"
-                placeholder="nombre@impulsogo.mx"
+                placeholder="impulso26"
               />
             </Field>
             <Field label="Contraseña" htmlFor="password">

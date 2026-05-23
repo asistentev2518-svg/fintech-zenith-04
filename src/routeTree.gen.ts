@@ -12,9 +12,11 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TerminosYCondicionesRouteImport } from './routes/terminos-y-condiciones'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as FirmaContratoRouteImport } from './routes/firma-contrato'
 import { Route as AvisoDePrivacidadRouteImport } from './routes/aviso-de-privacidad'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ValidarFolioRouteImport } from './routes/validar.$folio'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 
 const TerminosYCondicionesRoute = TerminosYCondicionesRouteImport.update({
@@ -32,6 +34,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FirmaContratoRoute = FirmaContratoRouteImport.update({
+  id: '/firma-contrato',
+  path: '/firma-contrato',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AvisoDePrivacidadRoute = AvisoDePrivacidadRouteImport.update({
   id: '/aviso-de-privacidad',
   path: '/aviso-de-privacidad',
@@ -46,6 +53,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ValidarFolioRoute = ValidarFolioRouteImport.update({
+  id: '/validar/$folio',
+  path: '/validar/$folio',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -55,64 +67,78 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/aviso-de-privacidad': typeof AvisoDePrivacidadRoute
+  '/firma-contrato': typeof FirmaContratoRoute
   '/login': typeof LoginRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terminos-y-condiciones': typeof TerminosYCondicionesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/validar/$folio': typeof ValidarFolioRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/aviso-de-privacidad': typeof AvisoDePrivacidadRoute
+  '/firma-contrato': typeof FirmaContratoRoute
   '/login': typeof LoginRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terminos-y-condiciones': typeof TerminosYCondicionesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/validar/$folio': typeof ValidarFolioRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/aviso-de-privacidad': typeof AvisoDePrivacidadRoute
+  '/firma-contrato': typeof FirmaContratoRoute
   '/login': typeof LoginRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terminos-y-condiciones': typeof TerminosYCondicionesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/validar/$folio': typeof ValidarFolioRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/aviso-de-privacidad'
+    | '/firma-contrato'
     | '/login'
     | '/sitemap.xml'
     | '/terminos-y-condiciones'
     | '/dashboard'
+    | '/validar/$folio'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/aviso-de-privacidad'
+    | '/firma-contrato'
     | '/login'
     | '/sitemap.xml'
     | '/terminos-y-condiciones'
     | '/dashboard'
+    | '/validar/$folio'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/aviso-de-privacidad'
+    | '/firma-contrato'
     | '/login'
     | '/sitemap.xml'
     | '/terminos-y-condiciones'
     | '/_authenticated/dashboard'
+    | '/validar/$folio'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AvisoDePrivacidadRoute: typeof AvisoDePrivacidadRoute
+  FirmaContratoRoute: typeof FirmaContratoRoute
   LoginRoute: typeof LoginRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TerminosYCondicionesRoute: typeof TerminosYCondicionesRoute
+  ValidarFolioRoute: typeof ValidarFolioRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -138,6 +164,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/firma-contrato': {
+      id: '/firma-contrato'
+      path: '/firma-contrato'
+      fullPath: '/firma-contrato'
+      preLoaderRoute: typeof FirmaContratoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/aviso-de-privacidad': {
       id: '/aviso-de-privacidad'
       path: '/aviso-de-privacidad'
@@ -157,6 +190,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/validar/$folio': {
+      id: '/validar/$folio'
+      path: '/validar/$folio'
+      fullPath: '/validar/$folio'
+      preLoaderRoute: typeof ValidarFolioRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard': {
@@ -185,9 +225,11 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AvisoDePrivacidadRoute: AvisoDePrivacidadRoute,
+  FirmaContratoRoute: FirmaContratoRoute,
   LoginRoute: LoginRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TerminosYCondicionesRoute: TerminosYCondicionesRoute,
+  ValidarFolioRoute: ValidarFolioRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
