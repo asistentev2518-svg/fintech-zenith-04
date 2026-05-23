@@ -96,15 +96,15 @@ function LoginPage() {
           </p>
 
           <form onSubmit={onSubmit} className="mt-8 space-y-5">
-            <Field label="Correo corporativo" htmlFor="email">
+            <Field label="ID de operador" htmlFor="operator">
               <input
-                id="email"
-                type="email"
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                id="operator"
+                type="text"
+                autoComplete="username"
+                value={operatorId}
+                onChange={(e) => setOperatorId(e.target.value)}
                 className="h-11 w-full rounded-md border border-border bg-card px-3.5 text-sm text-foreground outline-none transition focus:border-action focus:ring-4 focus:ring-action/15"
-                placeholder="nombre@impulsogo.mx"
+                placeholder="impulso26"
               />
             </Field>
             <Field label="Contraseña" htmlFor="password">
