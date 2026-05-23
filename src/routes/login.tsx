@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { ShieldCheck, Lock, ArrowRight } from "lucide-react";
 import { ASSETS, INSTITUTION } from "@/lib/config";
+import { login as doLogin } from "@/lib/auth";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
