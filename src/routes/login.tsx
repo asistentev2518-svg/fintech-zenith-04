@@ -17,7 +17,7 @@ export const Route = createFileRoute("/login")({
 
 function LoginPage() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const [operatorId, setOperatorId] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,13 +26,18 @@ function LoginPage() {
     e.preventDefault();
     setError(null);
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 600));
-    if (!email || !password) {
-      setError("Ingresa usuario y contraseña.");
+    await new Promise((r) => setTimeout(r, 450));
+    if (!operatorId || !password) {
+      setError("Ingresa tu ID y contraseña.");
       setLoading(false);
       return;
     }
-    sessionStorage.setItem("ig.session", JSON.stringify({ email, at: Date.now() }));
+    const session = doLogin(operatorId.trim(), password);
+    if (!session) {
+      setError("Credenciales inválidas. Verifica tu ID y contraseña.");
+      setLoading(false);
+      return;
+    }
     navigate({ to: "/dashboard" });
   };
 
