@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   Bell,
   Search,
+  Printer,
 } from "lucide-react";
 import { INSTITUTION } from "@/lib/config";
 
@@ -19,6 +20,7 @@ const navItems = [
   { to: "/dashboard", label: "Resumen", icon: LayoutDashboard, ready: true },
   { to: "/expedientes", label: "Expedientes", icon: FolderArchive, ready: true },
   { to: "/contratos", label: "Contratos", icon: FileSignature, ready: true },
+  { to: "/contrato-manual", label: "Contrato manual", icon: Printer, ready: true },
   { to: "/tablas", label: "Tablas de montos", icon: TableProperties, ready: true },
   { to: "/configuracion", label: "Configuración", icon: Settings, ready: true },
 ];
