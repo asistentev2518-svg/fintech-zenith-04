@@ -1,105 +1,58 @@
-# Fase 2 — Contrato Digital + credenciales internas
+# Plan revisado — Fases 5 a 7 (sin Cloud, sin email)
 
-## Parte A · Credenciales del sistema interno
-
-Crear archivo `src/lib/auth.ts` con la lista de operadores autorizados (validación 100% en cliente, sin backend, sin BD — coherente con el alcance actual del proyecto):
-
-- **ID:** `impulso26`
-- **Clave:** `252627`
-
-Actualizar `src/routes/login.tsx`:
-
-- Renombrar el campo "Correo corporativo" → "ID de operador".
-- Validar contra la lista de `auth.ts`. Si no coincide, mostrar "Credenciales inválidas" con estilo destructive.
-- Guardar en `sessionStorage` `{ operatorId, at }` y redirigir a `/dashboard`.
-- El guard de `_authenticated.tsx` ya está en su lugar.
-
-> Nota de seguridad: una credencial fija en cliente es adecuada solo para una demo interna. Si más adelante quieres autenticación real (Lovable Cloud + Supabase Auth, multiusuario, roles), lo migramos sin tocar la UI.
+Se descarta Fase 4 (Lovable Cloud). Se mantiene `localStorage` como única persistencia. Se remueve cualquier campo `email` del wizard y formularios. Foco: generación robusta de PDF y PNG, contrato manual imprimible, hardening y QA integral.
 
 ---
 
-## Parte B · Módulo de contrato digital (defaults razonables)
+## Fase 5 — Contrato manual imprimible + exportación PNG institucional
 
-Decisiones tomadas (skipeaste las preguntas):
+1. **Eliminar campo email** en `StepDatos.tsx`, esquema Zod y tipos de `contracts.ts`. Limpiar referencias en `ContractDocument.tsx`, `ContractDetailModal.tsx` y `validar.$folio.tsx`.
+2. **Ruta `/contrato-manual`** (pública o bajo `_authenticated`, default: autenticada):
+   - Formulario rápido: nombre, CURP, RFC, monto, plazo, dirección.
+   - Render A4 imprimible reutilizando `ContractDocument` en modo "manual" (sin firma digital, con líneas para firma física y huella).
+   - Botones: **Imprimir** (`window.print()` con `@media print` que oculta chrome) y **Exportar PDF** (reusa `pdf-export.ts`).
+3. **`src/lib/png-export.ts`**:
+   - Render 1080×1350 con `html2canvas` scale 2, fondo blanco.
+   - Header con logo + folio + QR validación; pie con CONDUSEF/SIPRES y datos legales de `config.ts`.
+   - Descarga como `contrato-{folio}.png`.
+4. **`src/components/contract/ContractCardInstitutional.tsx`**: tarjeta visual 1080×1350 (folio, monto, plazo, cliente, fecha, sellos). Montada off-screen al exportar.
+5. **Botones nuevos en `ContractDetailModal`**: "Exportar PNG" junto a "Reexportar PDF".
+6. **CSS `@media print`** en `styles.css`: ocultar header/sidebar/botones, fondo blanco, A4.
 
-- **Acceso:** público desde la landing (`/firma-contrato`) + listado en el dashboard.
-- **Alcance:** completo con validación de identidad + página pública de validación con QR.
-- **Exportación:** PDF institucional multi-página en alta resolución (2x, html2canvas + jsPDF).
+## Fase 6 — Hardening, SEO y accesibilidad
 
-### B.1 Wizard público `/firma-contrato`
+1. **SEO por ruta**: `head()` con title <60, description <160, og:title/og:description, canonical. `/firma-contrato`, `/contrato-manual` y `/validar/$folio` con `meta robots noindex`.
+2. **JSON-LD `FinancialService`** en `/` (landing).
+3. **Accesibilidad**: foco visible, labels en todos los inputs del wizard, `aria-live` en errores de validación, contraste AA verificado.
+4. **Validación Zod estricta**: CURP (regex 18 chars), RFC (regex 12-13), teléfono MX (10 dígitos), monto múltiplo de 5000, plazo en `allowedTermsYears`.
+5. **errorComponent + notFoundComponent** en cada ruta con loader; `defaultErrorComponent` en router.
+6. **Sitemap**: verificar que incluye solo rutas indexables (excluir wizard/validar/dashboard).
 
-5 pasos, una sola ruta con estado interno + barra de progreso premium:
+## Fase 7 — QA integral fase por fase
 
-1. **Datos del solicitante** — nombre completo, CURP, RFC, email, teléfono, domicilio, monto (slider del simulador) y plazo. Validación con zod + react-hook-form. Reutiliza tokens del design system.
-2. **Validación de identidad** — captura de INE frente, INE reverso y selfie usando `getUserMedia` (cámara) con fallback a subida de archivo. Checkbox de consentimiento biométrico. Previsualización antes de continuar.
-3. **Lectura del contrato** — render legal completo (encabezado institucional, partes, declaraciones, cláusulas, tabla de amortización generada con `finance.ts`, anexos). 7 checkboxes de aceptación expresa (los del proyecto original — texto legal preservado).
-4. **Firma digital** — canvas con `signature_pad` (ya viable en el cliente). Genera folio único `IG-YYYY-XXXX`, fecha ISO, huella técnica (hash del payload + UA + timestamp), guarda todo en estado.
-5. **Confirmación** — pantalla premium con folio destacado, QR generado con `qrcode` apuntando a `/validar/{folio}`, botón "Descargar PDF" y "Volver al inicio". El expediente firmado se persiste en `localStorage` (`ig.contracts`) para que el dashboard pueda listarlo.
+Recorrido con verificación funcional y reporte ✅/⚠️ + fixes en el momento.
 
-### B.2 Exportación PDF (resolver el render roto)
+- **F1 — Landing + simulador**: navegar `/`, validar hero, simulador calcula correctamente contra `finance.ts` (cuota, CAT, total), footer con SIPRES/CONDUSEF, responsive 375/1169.
+- **F2 — Login + wizard**: login `impulso26/252627`, recorrer 5 pasos (sin email), firmar, generar PDF; convertir PDF a imágenes con `pdftoppm` y revisar páginas (sin cortes, sin overflow, sin solapes).
+- **F3 — Dashboard**: tabla contratos, búsqueda/filtros, modal detalle, reexport PDF, métricas dashboard, tabla montos vs `finance.ts`, configuración.
+- **F5 — Manual + PNG**: formulario `/contrato-manual` genera PDF imprimible; `@media print` oculta chrome; PNG 1080×1350 verificado (dimensiones exactas, legible, QR escaneable).
+- **F6 — Hardening**: `<head>` por ruta correcto, `noindex` aplicado, validaciones Zod rechazan inputs inválidos, error boundaries muestran fallback.
 
-Crear `src/lib/pdf-export.ts`:
-
-- Render dedicado en un nodo oculto con ancho fijo A4 (794px @ 96dpi) y tipografía Inter embebida — esto evita los problemas de escalado y superposición del original.
-- `html2canvas` con `scale: 2`, `useCORS: true`, `backgroundColor: '#ffffff'`.
-- Paginación manual: dividir el alto del canvas en páginas A4 (1123px) y pegar cada slice en `jsPDF` para evitar cortes a mitad de párrafo.
-- Header/footer institucional en cada página (logo + folio + paginación).
-- Validación post-render: si el canvas final pesa > 8MB, regenerar con scale: 1.5.
-
-### B.3 Página pública `/validar/$folio`
-
-Ruta dinámica que lee `localStorage` (demo) y muestra:
-
-- Estado del contrato (Firmado / No encontrado) con tipografía clara.
-- Folio, fecha, monto, plazo, hash de huella técnica.
-- Sello visual estilo "Documento verificado" con la paleta institucional.
-- Meta `noindex` para no exponer folios en buscadores.
-
-### B.4 Integración en el dashboard
-
-- Reemplazar la tabla mock actual de `/dashboard` por los expedientes reales leídos de `localStorage`.
-- Activar el item del sidebar "Contratos" → nueva ruta `_authenticated/dashboard.contratos.tsx` con tabla, filtros (estado, fecha) y modal de detalle que reabre la vista de validación + botón "Reexportar PDF".
+Reporte final consolidado por fase con capturas de QA (imágenes temporales en `/tmp`, no se entregan al usuario).
 
 ---
 
-## Estructura de archivos nuevos
+## Detalles técnicos
 
-```text
-src/lib/
-  auth.ts                          # credenciales + helpers de sesión
-  pdf-export.ts                    # render A4 + paginación
-  contracts.ts                     # tipos, folio, hash, persistencia
-src/components/contract/
-  ContractWizard.tsx               # shell + stepper
-  steps/StepDatos.tsx
-  steps/StepIdentidad.tsx
-  steps/StepLectura.tsx
-  steps/StepFirma.tsx
-  steps/StepConfirmacion.tsx
-  ContractDocument.tsx             # render legal exportable
-  SignaturePadField.tsx
-src/routes/
-  firma-contrato.tsx               # wizard público
-  validar.$folio.tsx               # validación pública
-  _authenticated.dashboard.contratos.tsx
-```
+- **Sin backend**: toda la persistencia sigue en `localStorage` vía `contracts.ts`. Credenciales fijas en `auth.ts`.
+- **Sin email**: eliminar de schema, formularios, render de contrato y validación pública.
+- **Sin memoria de proyecto**: no se crean entradas en `mem://`.
+- **Archivos nuevos**: `src/lib/png-export.ts`, `src/components/contract/ContractCardInstitutional.tsx`, `src/routes/_authenticated.contrato-manual.tsx`.
+- **Archivos editados**: `StepDatos.tsx`, `contracts.ts`, `ContractDocument.tsx`, `ContractDetailModal.tsx`, `validar.$folio.tsx`, `styles.css` (print), todas las rutas (head/SEO + boundaries).
+- **Dependencias**: ninguna nueva (reutiliza `html2canvas`, `jspdf`, `qrcode`).
 
-Dependencias a instalar: `signature_pad`, `qrcode`, `html2canvas`, `jspdf`, `zod`, `react-hook-form`, `@hookform/resolvers`.
+## Supuestos
 
----
-
-## Validaciones antes de cerrar la fase
-
-- Login con `impulso26 / 252627` entra al dashboard; cualquier otra combinación muestra error.
-- Wizard completable en desktop (1169px) y móvil (375px).
-- PDF descargado abre limpio: sin texto cortado, sin superposición, header/footer en todas las páginas.
-- `/validar/{folio}` muestra el contrato firmado; folio inexistente muestra estado claro.
-
----
-
-## Lo que NO entra en esta fase (queda para Fase 3)
-
-- Submódulos restantes del sidebar: Expedientes detallados, Tablas de montos, Configuración.
-- Contrato manual imprimible (formato operativo del original).
-- Exportación PNG 1080x1350 institucional.
-- Migración a backend real (Lovable Cloud) si decides persistir contratos server-side.
+- Contrato manual queda bajo `_authenticated` (operador interno lo genera).
+- PNG institucional formato 1080×1350 (vertical estilo institucional).
+- Si el wizard ya guardó email en `localStorage` de pruebas previas, se ignora al renderear.
