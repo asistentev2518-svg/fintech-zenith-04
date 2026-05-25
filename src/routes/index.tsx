@@ -27,6 +27,28 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "Impulso Go — Financiamiento formal en línea" },
       { property: "og:description", content: "Contrato electrónico, firma con folio y trámite 100% en línea." },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://fintech-zenith-04.lovable.app/" },
+    ],
+    links: [{ rel: "canonical", href: "https://fintech-zenith-04.lovable.app/" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FinancialService",
+          name: INSTITUTION.legalName,
+          alternateName: INSTITUTION.shortName,
+          url: "https://fintech-zenith-04.lovable.app/",
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: INSTITUTION.address,
+            addressLocality: "Ciudad de México",
+            addressCountry: "MX",
+          },
+          areaServed: "MX",
+          slogan: "Financiamiento formal, contrato firmado en línea.",
+        }),
+      },
     ],
   }),
   component: HomePage,

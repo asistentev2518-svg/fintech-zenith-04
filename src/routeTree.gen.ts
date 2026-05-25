@@ -21,6 +21,7 @@ import { Route as AuthenticatedTablasRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedExpedientesRouteImport } from './routes/_authenticated.expedientes'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedContratosRouteImport } from './routes/_authenticated.contratos'
+import { Route as AuthenticatedContratoManualRouteImport } from './routes/_authenticated.contrato-manual'
 import { Route as AuthenticatedConfiguracionRouteImport } from './routes/_authenticated.configuracion'
 
 const TerminosYCondicionesRoute = TerminosYCondicionesRouteImport.update({
@@ -83,6 +84,12 @@ const AuthenticatedContratosRoute = AuthenticatedContratosRouteImport.update({
   path: '/contratos',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedContratoManualRoute =
+  AuthenticatedContratoManualRouteImport.update({
+    id: '/contrato-manual',
+    path: '/contrato-manual',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedConfiguracionRoute =
   AuthenticatedConfiguracionRouteImport.update({
     id: '/configuracion',
@@ -98,6 +105,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terminos-y-condiciones': typeof TerminosYCondicionesRoute
   '/configuracion': typeof AuthenticatedConfiguracionRoute
+  '/contrato-manual': typeof AuthenticatedContratoManualRoute
   '/contratos': typeof AuthenticatedContratosRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/expedientes': typeof AuthenticatedExpedientesRoute
@@ -112,6 +120,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terminos-y-condiciones': typeof TerminosYCondicionesRoute
   '/configuracion': typeof AuthenticatedConfiguracionRoute
+  '/contrato-manual': typeof AuthenticatedContratoManualRoute
   '/contratos': typeof AuthenticatedContratosRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/expedientes': typeof AuthenticatedExpedientesRoute
@@ -128,6 +137,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terminos-y-condiciones': typeof TerminosYCondicionesRoute
   '/_authenticated/configuracion': typeof AuthenticatedConfiguracionRoute
+  '/_authenticated/contrato-manual': typeof AuthenticatedContratoManualRoute
   '/_authenticated/contratos': typeof AuthenticatedContratosRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/expedientes': typeof AuthenticatedExpedientesRoute
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terminos-y-condiciones'
     | '/configuracion'
+    | '/contrato-manual'
     | '/contratos'
     | '/dashboard'
     | '/expedientes'
@@ -158,6 +169,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terminos-y-condiciones'
     | '/configuracion'
+    | '/contrato-manual'
     | '/contratos'
     | '/dashboard'
     | '/expedientes'
@@ -173,6 +185,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terminos-y-condiciones'
     | '/_authenticated/configuracion'
+    | '/_authenticated/contrato-manual'
     | '/_authenticated/contratos'
     | '/_authenticated/dashboard'
     | '/_authenticated/expedientes'
@@ -277,6 +290,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedContratosRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/contrato-manual': {
+      id: '/_authenticated/contrato-manual'
+      path: '/contrato-manual'
+      fullPath: '/contrato-manual'
+      preLoaderRoute: typeof AuthenticatedContratoManualRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/configuracion': {
       id: '/_authenticated/configuracion'
       path: '/configuracion'
@@ -289,6 +309,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteChildren {
   AuthenticatedConfiguracionRoute: typeof AuthenticatedConfiguracionRoute
+  AuthenticatedContratoManualRoute: typeof AuthenticatedContratoManualRoute
   AuthenticatedContratosRoute: typeof AuthenticatedContratosRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedExpedientesRoute: typeof AuthenticatedExpedientesRoute
@@ -297,6 +318,7 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedConfiguracionRoute: AuthenticatedConfiguracionRoute,
+  AuthenticatedContratoManualRoute: AuthenticatedContratoManualRoute,
   AuthenticatedContratosRoute: AuthenticatedContratosRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedExpedientesRoute: AuthenticatedExpedientesRoute,
@@ -320,13 +342,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

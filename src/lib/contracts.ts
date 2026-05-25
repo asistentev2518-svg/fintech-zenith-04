@@ -13,7 +13,6 @@ export interface ContractData {
   fullName: string;
   curp: string;
   rfc: string;
-  email: string;
   phone: string;
   address: string;
   amount: number;
