@@ -10,13 +10,12 @@ import type { ContractData } from "@/lib/contracts";
 const TERMS: TermYears[] = [2, 4, 6, 8];
 
 const schema = z.object({
-  fullName: z.string().min(5, "Nombre completo requerido"),
-  curp: z.string().regex(/^[A-Z0-9]{18}$/i, "CURP de 18 caracteres"),
-  rfc: z.string().regex(/^[A-Z0-9]{12,13}$/i, "RFC de 12 o 13 caracteres"),
-  email: z.string().email("Correo inválido"),
+  fullName: z.string().min(5, "Nombre completo requerido").max(120),
+  curp: z.string().regex(/^[A-Z]{4}\d{6}[HM][A-Z]{5}[A-Z0-9]\d$/i, "CURP inválida (18 caracteres)"),
+  rfc: z.string().regex(/^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/i, "RFC inválido"),
   phone: z.string().regex(/^\d{10}$/, "10 dígitos"),
-  address: z.string().min(10, "Domicilio completo requerido"),
-  amount: z.number().min(10000).max(250000),
+  address: z.string().min(10, "Domicilio completo requerido").max(240),
+  amount: z.number().min(10000).max(250000).refine((v) => v % 5000 === 0, "Múltiplo de $5,000"),
   termYears: z.union([z.literal(2), z.literal(4), z.literal(6), z.literal(8)]),
 });
 
@@ -39,7 +38,6 @@ export function StepDatos({ initial, onSubmit }: Props) {
       fullName: initial?.fullName ?? "",
       curp: initial?.curp ?? "",
       rfc: initial?.rfc ?? "",
-      email: initial?.email ?? "",
       phone: initial?.phone ?? "",
       address: initial?.address ?? "",
       amount,
@@ -69,9 +67,6 @@ export function StepDatos({ initial, onSubmit }: Props) {
         </FormField>
         <FormField label="RFC" error={errors.rfc?.message}>
           <input {...register("rfc")} className={`${inputCls} uppercase`} maxLength={13} />
-        </FormField>
-        <FormField label="Correo electrónico" error={errors.email?.message}>
-          <input {...register("email")} type="email" className={inputCls} placeholder="nombre@correo.com" />
         </FormField>
         <FormField label="Teléfono (10 dígitos)" error={errors.phone?.message}>
           <input {...register("phone")} inputMode="numeric" className={inputCls} maxLength={10} />

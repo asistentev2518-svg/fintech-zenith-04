@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import QRCode from "qrcode";
-import { X, Download, ExternalLink, FileText, Loader2 } from "lucide-react";
+import { X, Download, ExternalLink, FileText, Loader2, Image as ImageIcon } from "lucide-react";
 import type { SignedContract } from "@/lib/contracts";
 import { ContractDocument } from "./ContractDocument";
+import { ContractCardInstitutional } from "./ContractCardInstitutional";
 import { exportNodeToPdf } from "@/lib/pdf-export";
+import { exportNodeToPng } from "@/lib/png-export";
 import { formatMXN } from "@/lib/finance";
 
 interface Props {
@@ -13,8 +15,9 @@ interface Props {
 
 export function ContractDetailModal({ contract, onClose }: Props) {
   const docRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   const [qr, setQr] = useState<string>("");
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState<"pdf" | "png" | null>(null);
 
   useEffect(() => {
     if (!contract) return;
@@ -26,11 +29,21 @@ export function ContractDetailModal({ contract, onClose }: Props) {
 
   const reexport = async () => {
     if (!docRef.current) return;
-    setBusy(true);
+    setBusy("pdf");
     try {
       await exportNodeToPdf(docRef.current, `contrato-${contract.folio}.pdf`);
     } finally {
-      setBusy(false);
+      setBusy(null);
+    }
+  };
+
+  const exportPng = async () => {
+    if (!cardRef.current) return;
+    setBusy("png");
+    try {
+      await exportNodeToPng(cardRef.current, `contrato-${contract.folio}.png`, 1080, 1350);
+    } finally {
+      setBusy(null);
     }
   };
 
@@ -61,7 +74,6 @@ export function ContractDetailModal({ contract, onClose }: Props) {
             <Field label="CURP"><span className="font-mono text-xs">{contract.data.curp}</span></Field>
             <Field label="RFC"><span className="font-mono text-xs">{contract.data.rfc}</span></Field>
             <Field label="Teléfono">{contract.data.phone}</Field>
-            <Field label="Correo"><span className="break-all text-xs">{contract.data.email}</span></Field>
             <Field label="Firmado">{date.toLocaleString("es-MX")}</Field>
             <Field label="Huella técnica"><span className="break-all font-mono text-[10px]">{contract.hash}</span></Field>
           </dl>
@@ -93,18 +105,27 @@ export function ContractDetailModal({ contract, onClose }: Props) {
             Cerrar
           </button>
           <button
+            onClick={exportPng}
+            disabled={busy !== null}
+            className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-4 py-2 text-sm font-bold text-institutional hover:bg-accent disabled:opacity-60"
+          >
+            {busy === "png" ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImageIcon className="h-4 w-4" />}
+            Exportar PNG
+          </button>
+          <button
             onClick={reexport}
-            disabled={busy}
+            disabled={busy !== null}
             className="inline-flex items-center gap-2 rounded-md gradient-brand px-4 py-2 text-sm font-bold text-white shadow-card-soft disabled:opacity-60"
           >
-            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+            {busy === "pdf" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
             Reexportar PDF
           </button>
         </footer>
 
-        {/* Hidden render target for html2canvas */}
+        {/* Hidden render targets for html2canvas */}
         <div style={{ position: "fixed", left: -10000, top: 0 }} aria-hidden>
           <ContractDocument ref={docRef} contract={contract} qrDataUrl={qr || undefined} />
+          <ContractCardInstitutional ref={cardRef} contract={contract} qrDataUrl={qr || undefined} />
         </div>
       </div>
     </div>

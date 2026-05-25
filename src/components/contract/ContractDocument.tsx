@@ -70,7 +70,7 @@ export const ContractDocument = forwardRef<HTMLDivElement, Props>(
             representada por {INSTITUTION.representative}, en su carácter de {INSTITUTION.representativeTitle};
             y por la otra parte, <strong>{data.fullName.toUpperCase()}</strong>, en lo sucesivo{" "}
             <strong>"EL CLIENTE"</strong>, identificado con CURP {data.curp} y RFC {data.rfc},
-            con domicilio en {data.address}, teléfono {data.phone} y correo electrónico {data.email}.
+            con domicilio en {data.address} y teléfono {data.phone}.
           </p>
         </Section>
 

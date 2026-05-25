@@ -7,10 +7,11 @@ import { findContract, type SignedContract } from "@/lib/contracts";
 import { formatMXN } from "@/lib/finance";
 
 export const Route = createFileRoute("/validar/$folio")({
-  head: () => ({
+  head: ({ params }) => ({
     meta: [
-      { title: "Validar contrato — Impulso Go" },
-      { name: "robots", content: "noindex" },
+      { title: `Validar contrato ${params.folio} — Impulso Go` },
+      { name: "description", content: "Verificación pública de expediente firmado en Impulso Go." },
+      { name: "robots", content: "noindex,nofollow" },
     ],
   }),
   component: ValidarPage,
