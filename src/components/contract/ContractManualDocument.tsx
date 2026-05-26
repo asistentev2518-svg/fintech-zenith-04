@@ -72,7 +72,7 @@ export const ContractManualDocument = forwardRef<HTMLDivElement, Props>(
             en lo sucesivo <strong>"LA SOFOM"</strong>, representada por {INSTITUTION.representative},
             en su carácter de {INSTITUTION.representativeTitle}; y por la otra parte,{" "}
             <strong>{data.fullName.toUpperCase()}</strong>, en lo sucesivo <strong>"EL CLIENTE"</strong>,
-            identificado con CURP {data.curp} y RFC {data.rfc}, con domicilio en {data.address} y teléfono {data.phone}.
+            identificado con CURP {data.curp}, con domicilio en {data.address} y teléfono {data.phone}.
           </p>
         </Section>
 
