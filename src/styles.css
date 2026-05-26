@@ -1,6 +1,7 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+@import url("https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=JetBrains+Mono:wght@500;700&family=Manrope:wght@600;700;800&display=swap");
 
 @custom-variant dark (&:is(.dark *));
 
@@ -113,6 +114,14 @@
   --gradient-hero: linear-gradient(135deg, #06245C 0%, #03183f 60%, #0a1d4a 100%);
   --gradient-brand: linear-gradient(135deg, #06245C 0%, #1266D6 100%);
   --gradient-success: linear-gradient(90deg, #0A8F3C 0%, #1266D6 100%);
+
+  /* Document generator tokens (used by /generador, /contrato and /tabla-pagos) */
+  --brand: #06245C;
+  --ink: #0f172a;
+  --ink-soft: #64748b;
+  --hairline: #e2e8f0;
+  --success-soft: #e7f6ec;
+  --danger-soft: #fdecec;
 }
 
 .dark {
