@@ -30,6 +30,7 @@ export function PublicFooter() {
           <ul className="mt-4 space-y-2 text-sm">
             <li><a href="/#simulador" className="hover:text-white">Simulador</a></li>
             <li><a href="/#proceso" className="hover:text-white">Proceso</a></li>
+            <li><Link to="/contrato-electronico" className="text-white/60 hover:text-white">Contrato electrónico</Link></li>
             <li><Link to="/login" className="hover:text-white">Acceso interno</Link></li>
             <li>
               <a href={BRAND.whatsappUrl} target="_blank" rel="noopener noreferrer" className="hover:text-white">

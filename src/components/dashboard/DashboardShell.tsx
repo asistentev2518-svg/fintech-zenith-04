@@ -12,17 +12,21 @@ import {
   ShieldCheck,
   Bell,
   Search,
-  Printer,
+  FileImage,
+  CalendarRange,
+  FileEdit,
 } from "lucide-react";
 import { INSTITUTION } from "@/lib/config";
 
 const navItems = [
-  { to: "/dashboard", label: "Resumen", icon: LayoutDashboard, ready: true },
-  { to: "/expedientes", label: "Expedientes", icon: FolderArchive, ready: true },
-  { to: "/contratos", label: "Contratos", icon: FileSignature, ready: true },
-  { to: "/contrato-manual", label: "Contrato manual", icon: Printer, ready: true },
-  { to: "/tablas", label: "Tablas de montos", icon: TableProperties, ready: true },
-  { to: "/configuracion", label: "Configuración", icon: Settings, ready: true },
+  { to: "/dashboard",    label: "Resumen",          icon: LayoutDashboard, ready: true },
+  { to: "/expedientes",  label: "Expedientes",      icon: FolderArchive,   ready: true },
+  { to: "/contratos",    label: "Contratos",        icon: FileSignature,   ready: true },
+  { to: "/contrato",     label: "Editor de contrato", icon: FileEdit,      ready: true },
+  { to: "/generador",    label: "Generador docs",   icon: FileImage,       ready: true },
+  { to: "/tablas",       label: "Tabla de montos",  icon: TableProperties, ready: true },
+  { to: "/tabla-pagos",  label: "Tabla de pagos",   icon: CalendarRange,   ready: true },
+  { to: "/configuracion", label: "Configuración",   icon: Settings,        ready: true },
 ];
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {

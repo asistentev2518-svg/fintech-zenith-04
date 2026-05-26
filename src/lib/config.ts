@@ -25,8 +25,9 @@ export const BRAND = {
 } as const;
 
 export const ASSETS = {
-  condusef: "/assets/impulso-go/condusef.jpg",
-  sipres: "/assets/impulso-go/sipres.png",
+  condusef: "/assets/impulso-go/condusef.png",
+  sipres: "/assets/impulso-go/sipres-new.png",
+  logo: "/assets/impulso-go/logo.png",
   hero1: "/assets/impulso-go/hero-1.jpeg",
   hero2: "/assets/impulso-go/hero-2.jpeg",
   hero3: "/assets/impulso-go/hero-3.jpeg",
