@@ -19,10 +19,12 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ValidarFolioRouteImport } from './routes/validar.$folio'
 import { Route as AuthenticatedTablasRouteImport } from './routes/_authenticated.tablas'
+import { Route as AuthenticatedTablaPagosRouteImport } from './routes/_authenticated.tabla-pagos'
 import { Route as AuthenticatedGeneradorRouteImport } from './routes/_authenticated.generador'
 import { Route as AuthenticatedExpedientesRouteImport } from './routes/_authenticated.expedientes'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedContratosRouteImport } from './routes/_authenticated.contratos'
+import { Route as AuthenticatedContratoRouteImport } from './routes/_authenticated.contrato'
 import { Route as AuthenticatedConfiguracionRouteImport } from './routes/_authenticated.configuracion'
 
 const TerminosYCondicionesRoute = TerminosYCondicionesRouteImport.update({
@@ -74,6 +76,11 @@ const AuthenticatedTablasRoute = AuthenticatedTablasRouteImport.update({
   path: '/tablas',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedTablaPagosRoute = AuthenticatedTablaPagosRouteImport.update({
+  id: '/tabla-pagos',
+  path: '/tabla-pagos',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedGeneradorRoute = AuthenticatedGeneradorRouteImport.update({
   id: '/generador',
   path: '/generador',
@@ -95,6 +102,11 @@ const AuthenticatedContratosRoute = AuthenticatedContratosRouteImport.update({
   path: '/contratos',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedContratoRoute = AuthenticatedContratoRouteImport.update({
+  id: '/contrato',
+  path: '/contrato',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedConfiguracionRoute =
   AuthenticatedConfiguracionRouteImport.update({
     id: '/configuracion',
@@ -111,10 +123,12 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terminos-y-condiciones': typeof TerminosYCondicionesRoute
   '/configuracion': typeof AuthenticatedConfiguracionRoute
+  '/contrato': typeof AuthenticatedContratoRoute
   '/contratos': typeof AuthenticatedContratosRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/expedientes': typeof AuthenticatedExpedientesRoute
   '/generador': typeof AuthenticatedGeneradorRoute
+  '/tabla-pagos': typeof AuthenticatedTablaPagosRoute
   '/tablas': typeof AuthenticatedTablasRoute
   '/validar/$folio': typeof ValidarFolioRoute
 }
@@ -127,10 +141,12 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terminos-y-condiciones': typeof TerminosYCondicionesRoute
   '/configuracion': typeof AuthenticatedConfiguracionRoute
+  '/contrato': typeof AuthenticatedContratoRoute
   '/contratos': typeof AuthenticatedContratosRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/expedientes': typeof AuthenticatedExpedientesRoute
   '/generador': typeof AuthenticatedGeneradorRoute
+  '/tabla-pagos': typeof AuthenticatedTablaPagosRoute
   '/tablas': typeof AuthenticatedTablasRoute
   '/validar/$folio': typeof ValidarFolioRoute
 }
@@ -145,10 +161,12 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terminos-y-condiciones': typeof TerminosYCondicionesRoute
   '/_authenticated/configuracion': typeof AuthenticatedConfiguracionRoute
+  '/_authenticated/contrato': typeof AuthenticatedContratoRoute
   '/_authenticated/contratos': typeof AuthenticatedContratosRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/expedientes': typeof AuthenticatedExpedientesRoute
   '/_authenticated/generador': typeof AuthenticatedGeneradorRoute
+  '/_authenticated/tabla-pagos': typeof AuthenticatedTablaPagosRoute
   '/_authenticated/tablas': typeof AuthenticatedTablasRoute
   '/validar/$folio': typeof ValidarFolioRoute
 }
@@ -163,10 +181,12 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terminos-y-condiciones'
     | '/configuracion'
+    | '/contrato'
     | '/contratos'
     | '/dashboard'
     | '/expedientes'
     | '/generador'
+    | '/tabla-pagos'
     | '/tablas'
     | '/validar/$folio'
   fileRoutesByTo: FileRoutesByTo
@@ -179,10 +199,12 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terminos-y-condiciones'
     | '/configuracion'
+    | '/contrato'
     | '/contratos'
     | '/dashboard'
     | '/expedientes'
     | '/generador'
+    | '/tabla-pagos'
     | '/tablas'
     | '/validar/$folio'
   id:
@@ -196,10 +218,12 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terminos-y-condiciones'
     | '/_authenticated/configuracion'
+    | '/_authenticated/contrato'
     | '/_authenticated/contratos'
     | '/_authenticated/dashboard'
     | '/_authenticated/expedientes'
     | '/_authenticated/generador'
+    | '/_authenticated/tabla-pagos'
     | '/_authenticated/tablas'
     | '/validar/$folio'
   fileRoutesById: FileRoutesById
@@ -288,6 +312,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTablasRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/tabla-pagos': {
+      id: '/_authenticated/tabla-pagos'
+      path: '/tabla-pagos'
+      fullPath: '/tabla-pagos'
+      preLoaderRoute: typeof AuthenticatedTablaPagosRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/generador': {
       id: '/_authenticated/generador'
       path: '/generador'
@@ -316,6 +347,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedContratosRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/contrato': {
+      id: '/_authenticated/contrato'
+      path: '/contrato'
+      fullPath: '/contrato'
+      preLoaderRoute: typeof AuthenticatedContratoRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/configuracion': {
       id: '/_authenticated/configuracion'
       path: '/configuracion'
@@ -328,19 +366,23 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteChildren {
   AuthenticatedConfiguracionRoute: typeof AuthenticatedConfiguracionRoute
+  AuthenticatedContratoRoute: typeof AuthenticatedContratoRoute
   AuthenticatedContratosRoute: typeof AuthenticatedContratosRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedExpedientesRoute: typeof AuthenticatedExpedientesRoute
   AuthenticatedGeneradorRoute: typeof AuthenticatedGeneradorRoute
+  AuthenticatedTablaPagosRoute: typeof AuthenticatedTablaPagosRoute
   AuthenticatedTablasRoute: typeof AuthenticatedTablasRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedConfiguracionRoute: AuthenticatedConfiguracionRoute,
+  AuthenticatedContratoRoute: AuthenticatedContratoRoute,
   AuthenticatedContratosRoute: AuthenticatedContratosRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedExpedientesRoute: AuthenticatedExpedientesRoute,
   AuthenticatedGeneradorRoute: AuthenticatedGeneradorRoute,
+  AuthenticatedTablaPagosRoute: AuthenticatedTablaPagosRoute,
   AuthenticatedTablasRoute: AuthenticatedTablasRoute,
 }
 
@@ -362,3 +404,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
