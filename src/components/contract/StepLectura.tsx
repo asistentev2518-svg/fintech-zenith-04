@@ -46,14 +46,18 @@ export function StepLectura({ data, onSubmit }: Props) {
             <li>· Total estimado: <strong>{formatMXN(payment.total)}</strong></li>
           </ul>
 
-          <h4 className="mt-5 text-sm font-black text-institutional">III. Cláusulas principales</h4>
-          <p className="mt-2"><strong>PRIMERA.</strong> Objeto: otorgamiento del financiamiento por el monto referido.</p>
-          <p className="mt-2"><strong>SEGUNDA.</strong> Tasa fija anual del {INSTITUTION.annualRatePercent}% sobre saldos insolutos.</p>
-          <p className="mt-2"><strong>TERCERA.</strong> Pago mensual puntual conforme al calendario.</p>
-          <p className="mt-2"><strong>CUARTA.</strong> Penalización del {INSTITUTION.penaltyPercent}% por incumplimiento sobre saldo vencido.</p>
-          <p className="mt-2"><strong>QUINTA.</strong> Tratamiento de datos personales conforme al Aviso de Privacidad.</p>
-          <p className="mt-2"><strong>SEXTA.</strong> Validez de la firma electrónica y evidencia técnica como medio de prueba.</p>
-          <p className="mt-2"><strong>SÉPTIMA.</strong> Jurisdicción de tribunales competentes de {INSTITUTION.jurisdiction}.</p>
+          <h4 className="mt-5 text-sm font-black text-institutional">III. Declaraciones</h4>
+          <p className="mt-2 text-sm">{DECLARACIONES_TEXT}</p>
+
+          <h4 className="mt-5 text-sm font-black text-institutional">IV. Cláusulas</h4>
+          {CONTRACT_CLAUSES.map((c) => (
+            <div key={c.n} className="mt-3">
+              <p className="text-sm font-bold text-institutional">{c.n} {c.title}</p>
+              {c.paragraphs.map((p, i) => (
+                <p key={i} className="mt-1 text-sm">{p}</p>
+              ))}
+            </div>
+          ))}
 
           <p className="mt-6 text-xs text-muted-foreground">
             El texto completo del contrato y sus anexos se conservan en el PDF
