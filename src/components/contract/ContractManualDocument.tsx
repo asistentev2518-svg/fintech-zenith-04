@@ -2,6 +2,7 @@ import { forwardRef } from "react";
 import { formatMXN, calculateMonthlyPayment, type TermYears } from "@/lib/finance";
 import { INSTITUTION } from "@/lib/config";
 import { ACCEPTANCES } from "@/lib/contracts";
+import { CONTRACT_CLAUSES, DECLARACIONES_TEXT } from "./clauses";
 
 export interface ManualContractInput {
   folio: string;
