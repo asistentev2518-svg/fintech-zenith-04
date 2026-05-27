@@ -3,6 +3,7 @@ import { formatMXN, calculateMonthlyPayment } from "@/lib/finance";
 import { INSTITUTION } from "@/lib/config";
 import type { SignedContract } from "@/lib/contracts";
 import { ACCEPTANCES } from "@/lib/contracts";
+import { CONTRACT_CLAUSES, DECLARACIONES_TEXT } from "./clauses";
 
 interface Props {
   contract: SignedContract;
