@@ -2,6 +2,7 @@ import { forwardRef } from "react";
 import { formatMXN, calculateMonthlyPayment, type TermYears } from "@/lib/finance";
 import { INSTITUTION } from "@/lib/config";
 import { ACCEPTANCES } from "@/lib/contracts";
+import { CONTRACT_CLAUSES, DECLARACIONES_TEXT } from "./clauses";
 
 export interface ManualContractInput {
   folio: string;
@@ -87,31 +88,21 @@ export const ContractManualDocument = forwardRef<HTMLDivElement, Props>(
           </div>
         </Section>
 
-        <Section title="III. Cláusulas">
-          <Clause n="PRIMERA. Objeto.">
-            LA SOFOM otorga a EL CLIENTE un financiamiento por {formatMXN(data.amount)}, pagadero en {months} mensualidades fijas.
-          </Clause>
-          <Clause n="SEGUNDA. Tasa.">
-            Tasa ordinaria anual fija del {INSTITUTION.annualRatePercent}% sobre saldos insolutos.
-          </Clause>
-          <Clause n="TERCERA. Pago.">
-            Cuota mensual de {formatMXN(payment.cuota)} en las fechas establecidas en el calendario.
-          </Clause>
-          <Clause n="CUARTA. Incumplimiento.">
-            En caso de mora se aplicará una penalización del {INSTITUTION.penaltyPercent}% sobre el saldo vencido.
-          </Clause>
-          <Clause n="QUINTA. Datos personales.">
-            EL CLIENTE consiente el tratamiento conforme al Aviso de Privacidad de LA SOFOM.
-          </Clause>
-          <Clause n="SEXTA. Firma autógrafa.">
-            Las partes formalizan el presente mediante firma autógrafa, conservada como instrumento físico además del expediente electrónico.
-          </Clause>
-          <Clause n="SÉPTIMA. Jurisdicción.">
-            Para la interpretación y cumplimiento las partes se someten a los tribunales competentes de {INSTITUTION.jurisdiction}.
-          </Clause>
+        <Section title="III. Declaraciones">
+          <p style={{ margin: 0 }}>{DECLARACIONES_TEXT}</p>
         </Section>
 
-        <Section title="IV. Aceptaciones expresas">
+        <Section title="IV. Cláusulas">
+          {CONTRACT_CLAUSES.map((c) => (
+            <Clause key={c.n} n={`${c.n} ${c.title}`}>
+              {c.paragraphs.map((p, i) => (
+                <span key={i} style={{ display: "block", marginTop: i === 0 ? 0 : 6 }}>{p}</span>
+              ))}
+            </Clause>
+          ))}
+        </Section>
+
+        <Section title="V. Aceptaciones expresas">
           <ol style={{ paddingLeft: 18, margin: 0 }}>
             {ACCEPTANCES.map((a, i) => (
               <li key={i} style={{ marginBottom: 6 }}>{a}</li>
@@ -119,7 +110,7 @@ export const ContractManualDocument = forwardRef<HTMLDivElement, Props>(
           </ol>
         </Section>
 
-        <Section title="V. Firmas autógrafas">
+        <Section title="VI. Firmas autógrafas">
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 32, marginTop: 28 }}>
             <SignatureBlock title="EL CLIENTE" name={data.fullName.toUpperCase()} />
             <SignatureBlock title="LA SOFOM" name={`${INSTITUTION.representative} — ${INSTITUTION.representativeTitle}`} />

@@ -3,6 +3,7 @@ import { formatMXN, calculateMonthlyPayment } from "@/lib/finance";
 import { INSTITUTION } from "@/lib/config";
 import type { SignedContract } from "@/lib/contracts";
 import { ACCEPTANCES } from "@/lib/contracts";
+import { CONTRACT_CLAUSES, DECLARACIONES_TEXT } from "./clauses";
 
 interface Props {
   contract: SignedContract;
@@ -86,37 +87,20 @@ export const ContractDocument = forwardRef<HTMLDivElement, Props>(
           </Grid>
         </Section>
 
+        {/* Declaraciones */}
+        <Section title="III. Declaraciones">
+          <p style={{ margin: 0 }}>{DECLARACIONES_TEXT}</p>
+        </Section>
+
         {/* Cláusulas */}
-        <Section title="III. Cláusulas">
-          <Clause n="PRIMERA. Objeto.">
-            LA SOFOM otorga a EL CLIENTE un financiamiento por la cantidad de {formatMXN(data.amount)},
-            que se obliga a pagar en {months} mensualidades fijas conforme a las condiciones aquí pactadas.
-          </Clause>
-          <Clause n="SEGUNDA. Tasa de interés.">
-            Las partes acuerdan una tasa de interés ordinaria anual fija del{" "}
-            {INSTITUTION.annualRatePercent}%, calculada sobre saldos insolutos.
-          </Clause>
-          <Clause n="TERCERA. Forma de pago.">
-            EL CLIENTE se obliga a cubrir puntualmente cada mensualidad por la cantidad de{" "}
-            {formatMXN(payment.cuota)} en las fechas establecidas en el calendario de pagos.
-          </Clause>
-          <Clause n="CUARTA. Incumplimiento.">
-            En caso de mora se generará una penalización equivalente al {INSTITUTION.penaltyPercent}%
-            sobre el saldo vencido, sin perjuicio de las acciones legales aplicables.
-          </Clause>
-          <Clause n="QUINTA. Tratamiento de datos.">
-            EL CLIENTE consiente el tratamiento de su información personal, identificación oficial
-            e imagen facial conforme al Aviso de Privacidad publicado por LA SOFOM.
-          </Clause>
-          <Clause n="SEXTA. Firma electrónica.">
-            Las partes reconocen plena validez a la firma electrónica capturada en este expediente,
-            así como a la evidencia técnica (folio, fecha, dispositivo, huella de generación) como
-            parte integral del contrato y medio de prueba.
-          </Clause>
-          <Clause n="SÉPTIMA. Jurisdicción.">
-            Para la interpretación y cumplimiento del presente contrato, las partes se someten a la
-            jurisdicción de los tribunales competentes de {INSTITUTION.jurisdiction}.
-          </Clause>
+        <Section title="IV. Cláusulas">
+          {CONTRACT_CLAUSES.map((c) => (
+            <Clause key={c.n} n={`${c.n} ${c.title}`}>
+              {c.paragraphs.map((p, i) => (
+                <span key={i} style={{ display: "block", marginTop: i === 0 ? 0 : 6 }}>{p}</span>
+              ))}
+            </Clause>
+          ))}
         </Section>
 
         {/* Tabla referencial */}
