@@ -3,6 +3,7 @@ import { ArrowRight, ScrollText } from "lucide-react";
 import { ACCEPTANCES, type ContractData } from "@/lib/contracts";
 import { INSTITUTION } from "@/lib/config";
 import { calculateMonthlyPayment, formatMXN } from "@/lib/finance";
+import { CONTRACT_CLAUSES, DECLARACIONES_TEXT } from "./clauses";
 
 interface Props {
   data: ContractData;
