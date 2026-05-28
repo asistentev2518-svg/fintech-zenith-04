@@ -297,8 +297,14 @@ const PageThree = forwardRef<HTMLDivElement, { s: State }>(function PageThree({ 
           <div style={{ border: "1px solid #e2e8f0", borderRadius: 8, padding: "16px 18px", textAlign: "center" }}>
             <div style={{ fontFamily: "'Manrope', sans-serif", fontWeight: 800, fontSize: 12, color: "#0B2A5B", letterSpacing: "0.05em" }}>FIRMA DEL REPRESENTANTE LEGAL</div>
             <div style={{ fontSize: 10, color: "#64748b", marginTop: 2 }}>{INSTITUTION.legalName}</div>
-            <div style={{ marginTop: 18, fontFamily: "'Caveat', cursive", fontSize: 38, color: "#0B2A5B" }}>Claudia</div>
-            <div style={{ borderBottom: "1px solid #0f172a", marginTop: 4, height: 1 }} />
+            <div style={{ marginTop: 14, position: "relative", height: 70, display: "flex", justifyContent: "center", alignItems: "flex-end" }}>
+              <svg viewBox="0 0 280 70" width="240" height="62" style={{ overflow: "visible" }}>
+                <text x="10" y="42" fontFamily="'Caveat', 'Brush Script MT', cursive" fontSize="40" fontStyle="italic" fill="#0B2A5B" fontWeight="700">Claudia T.</text>
+                <path d="M 8 56 C 60 62, 130 48, 210 54 C 230 55, 248 50, 268 38" stroke="#0B2A5B" strokeWidth="1.6" fill="none" strokeLinecap="round" />
+                <path d="M 195 18 C 210 22, 222 30, 232 44" stroke="#0B2A5B" strokeWidth="1.2" fill="none" strokeLinecap="round" opacity="0.85" />
+              </svg>
+            </div>
+            <div style={{ borderBottom: "1px solid #0f172a", marginTop: 2, height: 1 }} />
             <div style={{ marginTop: 8, fontSize: 11, textAlign: "left" }}>
               <div><strong>Nombre:</strong> {INSTITUTION.representative}</div>
               <div style={{ marginTop: 6 }}><strong>Cargo:</strong> {INSTITUTION.representativeTitle}</div>
