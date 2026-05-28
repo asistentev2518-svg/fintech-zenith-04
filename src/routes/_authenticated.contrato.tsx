@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { forwardRef, useRef, useState } from "react";
 import { Download, Loader2, FileEdit } from "lucide-react";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
-import { INSTITUTION as _INST } from "@/lib/config";
 import { INSTITUTION, ASSETS } from "@/lib/config";
 import { exportNodeToPng } from "@/lib/png-export";
 
