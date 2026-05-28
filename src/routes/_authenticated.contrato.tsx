@@ -107,20 +107,9 @@ function ContratoEditorPage() {
             <F label="Domicilio" span={3}><input value={s.address} onChange={(e) => u("address", e.target.value)} className={inp} /></F>
           </div>
 
-          <h2 className="pt-2 text-sm font-black uppercase tracking-[0.16em] text-institutional">Datos del financiamiento</h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <F label="Monto"><input type="number" min={10000} step={5000} value={s.amount} onChange={(e) => u("amount", Number(e.target.value) || 0)} className={inp} /></F>
-            <F label="Plazo (años)">
-              <div className="mt-1 grid grid-cols-4 gap-1">
-                {ALLOWED_TERMS.map((t) => (
-                  <button key={t} type="button" onClick={() => u("termYears", t)} className={`h-10 rounded-md text-sm font-black ${s.termYears === t ? "bg-institutional text-white" : "bg-surface hover:bg-accent"}`}>{t}</button>
-                ))}
-              </div>
-            </F>
-            <F label="Fecha otorgamiento"><input value={s.fechaOtorgamiento} onChange={(e) => u("fechaOtorgamiento", e.target.value)} className={inp} /></F>
-            <F label="Fecha vencimiento"><input value={s.fechaVencimiento} onChange={(e) => u("fechaVencimiento", e.target.value)} className={inp} /></F>
-            <F label="Cuenta a acreditar" span={2}><input value={s.bankAccount} onChange={(e) => u("bankAccount", e.target.value)} className={inp} /></F>
-            <F label="Nombre del banco" span={2}><input value={s.bankName} onChange={(e) => u("bankName", e.target.value)} className={inp} /></F>
+          <div className="rounded-xl border border-dashed border-action/40 bg-action/5 px-4 py-3 text-[11px] text-muted-foreground">
+            <strong className="text-institutional">Nota:</strong> Esta herramienta genera un PDF/PNG en blanco para llenado manual con bolígrafo.
+            Los datos del financiamiento (monto, plazo, fechas, cuentas) deben capturarse únicamente en el <strong>Contrato digital</strong>.
           </div>
 
           <details className="rounded-xl border border-border bg-surface-alt p-4">
