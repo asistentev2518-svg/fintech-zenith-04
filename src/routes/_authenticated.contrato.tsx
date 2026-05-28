@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { forwardRef, useRef, useState } from "react";
 import { Download, Loader2, FileEdit } from "lucide-react";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
-import { ALLOWED_TERMS, calculateMonthlyPayment, formatMXN, type TermYears } from "@/lib/finance";
+import { INSTITUTION as _INST } from "@/lib/config";
 import { INSTITUTION, ASSETS } from "@/lib/config";
 import { exportNodeToPng } from "@/lib/png-export";
 
