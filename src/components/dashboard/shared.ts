@@ -97,6 +97,6 @@ export function defaultMaster(): MasterData {
     amount: 50000,
     termYears: 4,
     commission: 1500,
-    executive: "Claudia Tellez Hernandez",
+    executive: "Ely Garcia",
   };
 }
