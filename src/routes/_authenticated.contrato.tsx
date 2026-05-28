@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { forwardRef, useRef, useState } from "react";
 import { Download, Loader2, FileEdit } from "lucide-react";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
-import { ALLOWED_TERMS, calculateMonthlyPayment, formatMXN, type TermYears } from "@/lib/finance";
 import { INSTITUTION, ASSETS } from "@/lib/config";
 import { exportNodeToPng } from "@/lib/png-export";
 
@@ -48,25 +47,14 @@ type State = {
   phone: string;
   income: string;
   address: string;
-  amount: number;
-  termYears: TermYears;
-  bankAccount: string;
-  bankName: string;
-  fechaOtorgamiento: string;
-  fechaVencimiento: string;
   clauses: typeof DEFAULTS;
 };
 
 function defaultState(): State {
   const today = new Date();
-  const end = new Date(today.getFullYear() + 4, today.getMonth(), today.getDate());
-  const fmt = (d: Date) => d.toLocaleDateString("es-MX", { day: "2-digit", month: "2-digit", year: "numeric" });
   return {
     folio: `IG-${today.getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
     fullName: "", curp: "", sexo: "Masculino", phone: "", income: "", address: "",
-    amount: 50000, termYears: 4,
-    bankAccount: "", bankName: "",
-    fechaOtorgamiento: fmt(today), fechaVencimiento: fmt(end),
     clauses: { ...DEFAULTS },
   };
 }
@@ -118,20 +106,9 @@ function ContratoEditorPage() {
             <F label="Domicilio" span={3}><input value={s.address} onChange={(e) => u("address", e.target.value)} className={inp} /></F>
           </div>
 
-          <h2 className="pt-2 text-sm font-black uppercase tracking-[0.16em] text-institutional">Datos del financiamiento</h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <F label="Monto"><input type="number" min={10000} step={5000} value={s.amount} onChange={(e) => u("amount", Number(e.target.value) || 0)} className={inp} /></F>
-            <F label="Plazo (años)">
-              <div className="mt-1 grid grid-cols-4 gap-1">
-                {ALLOWED_TERMS.map((t) => (
-                  <button key={t} type="button" onClick={() => u("termYears", t)} className={`h-10 rounded-md text-sm font-black ${s.termYears === t ? "bg-institutional text-white" : "bg-surface hover:bg-accent"}`}>{t}</button>
-                ))}
-              </div>
-            </F>
-            <F label="Fecha otorgamiento"><input value={s.fechaOtorgamiento} onChange={(e) => u("fechaOtorgamiento", e.target.value)} className={inp} /></F>
-            <F label="Fecha vencimiento"><input value={s.fechaVencimiento} onChange={(e) => u("fechaVencimiento", e.target.value)} className={inp} /></F>
-            <F label="Cuenta a acreditar" span={2}><input value={s.bankAccount} onChange={(e) => u("bankAccount", e.target.value)} className={inp} /></F>
-            <F label="Nombre del banco" span={2}><input value={s.bankName} onChange={(e) => u("bankName", e.target.value)} className={inp} /></F>
+          <div className="rounded-xl border border-dashed border-action/40 bg-action/5 px-4 py-3 text-[11px] text-muted-foreground">
+            <strong className="text-institutional">Nota:</strong> Esta herramienta genera un PDF/PNG en blanco para llenado manual con bolígrafo.
+            Los datos del financiamiento (monto, plazo, fechas, cuentas) deben capturarse únicamente en el <strong>Contrato digital</strong>.
           </div>
 
           <details className="rounded-xl border border-border bg-surface-alt p-4">
@@ -249,35 +226,25 @@ const PageOne = forwardRef<HTMLDivElement, { s: State }>(function PageOne({ s },
 
         <SectionLabel n="2" title="DATOS DEL FINANCIAMIENTO" />
         <div style={{ border: "1px solid #e2e8f0", borderRadius: 10, padding: "16px 20px", marginBottom: 14 }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 18, textAlign: "center" }}>
-            <div>
-              <Mini label="MONTO SOLICITADO" />
-              <div style={{ fontFamily: "'Manrope', sans-serif", fontWeight: 800, fontSize: 20, color: "#0B2A5B", marginTop: 4 }}>{formatMXN(s.amount)}</div>
-            </div>
-            <div>
-              <Mini label="TASA ANUAL ORDINARIA FIJA" />
-              <div style={{ fontFamily: "'Manrope', sans-serif", fontWeight: 800, fontSize: 24, color: "#1266D6", marginTop: 2 }}>{INSTITUTION.annualRatePercent}%</div>
-              <div style={{ fontSize: 10, color: "#1266D6", fontWeight: 700 }}>ANUAL FIJA</div>
-            </div>
-            <div>
-              <Mini label="PLAZO EN AÑOS" />
-              <div style={{ fontFamily: "'Manrope', sans-serif", fontWeight: 800, fontSize: 20, color: "#0B2A5B", marginTop: 4 }}>{s.termYears} años</div>
-            </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 18 }}>
+            <Row label="MONTO SOLICITADO" value="" mono />
+            <Row label="TASA ANUAL ORDINARIA FIJA" value={`${INSTITUTION.annualRatePercent}%`} />
+            <Row label="PLAZO EN AÑOS" value="" />
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18, marginTop: 14, paddingTop: 14, borderTop: "1px dashed #e2e8f0" }}>
-            <Row label="FECHA DE OTORGAMIENTO" value={s.fechaOtorgamiento} mono />
-            <Row label="FECHA ESTIMADA DE VENCIMIENTO" value={s.fechaVencimiento} mono />
+            <Row label="FECHA DE OTORGAMIENTO" value="" mono />
+            <Row label="FECHA ESTIMADA DE VENCIMIENTO" value="" mono />
           </div>
           <p style={{ marginTop: 10, marginBottom: 0, fontSize: 10.5, color: "#64748b", fontStyle: "italic" }}>
-            ⓘ La tasa anual ordinaria fija del {INSTITUTION.annualRatePercent}% es fija durante toda la vigencia del contrato. Pago mensual estimado: <strong>{formatMXN(calculateMonthlyPayment(s.amount, s.termYears).cuota)}</strong>.
+            ⓘ Espacios destinados para llenado manual con bolígrafo. La tasa anual ordinaria fija del {INSTITUTION.annualRatePercent}% es fija durante toda la vigencia del contrato.
           </p>
         </div>
 
         <SectionLabel n="3" title="DATOS BANCARIOS" />
         <div style={{ border: "1px solid #e2e8f0", borderRadius: 10, padding: "16px 20px", marginBottom: 14 }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
-            <Row label="CUENTA A ACREDITAR" value={s.bankAccount} mono />
-            <Row label="NOMBRE DEL BANCO" value={s.bankName} />
+            <Row label="CUENTA A ACREDITAR" value="" mono />
+            <Row label="NOMBRE DEL BANCO" value="" />
           </div>
         </div>
 
@@ -330,8 +297,14 @@ const PageThree = forwardRef<HTMLDivElement, { s: State }>(function PageThree({ 
           <div style={{ border: "1px solid #e2e8f0", borderRadius: 8, padding: "16px 18px", textAlign: "center" }}>
             <div style={{ fontFamily: "'Manrope', sans-serif", fontWeight: 800, fontSize: 12, color: "#0B2A5B", letterSpacing: "0.05em" }}>FIRMA DEL REPRESENTANTE LEGAL</div>
             <div style={{ fontSize: 10, color: "#64748b", marginTop: 2 }}>{INSTITUTION.legalName}</div>
-            <div style={{ marginTop: 18, fontFamily: "'Caveat', cursive", fontSize: 38, color: "#0B2A5B" }}>Claudia</div>
-            <div style={{ borderBottom: "1px solid #0f172a", marginTop: 4, height: 1 }} />
+            <div style={{ marginTop: 14, position: "relative", height: 70, display: "flex", justifyContent: "center", alignItems: "flex-end" }}>
+              <svg viewBox="0 0 280 70" width="240" height="62" style={{ overflow: "visible" }}>
+                <text x="10" y="42" fontFamily="'Caveat', 'Brush Script MT', cursive" fontSize="40" fontStyle="italic" fill="#0B2A5B" fontWeight="700">Claudia T.</text>
+                <path d="M 8 56 C 60 62, 130 48, 210 54 C 230 55, 248 50, 268 38" stroke="#0B2A5B" strokeWidth="1.6" fill="none" strokeLinecap="round" />
+                <path d="M 195 18 C 210 22, 222 30, 232 44" stroke="#0B2A5B" strokeWidth="1.2" fill="none" strokeLinecap="round" opacity="0.85" />
+              </svg>
+            </div>
+            <div style={{ borderBottom: "1px solid #0f172a", marginTop: 2, height: 1 }} />
             <div style={{ marginTop: 8, fontSize: 11, textAlign: "left" }}>
               <div><strong>Nombre:</strong> {INSTITUTION.representative}</div>
               <div style={{ marginTop: 6 }}><strong>Cargo:</strong> {INSTITUTION.representativeTitle}</div>

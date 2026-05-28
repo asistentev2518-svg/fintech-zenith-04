@@ -21,6 +21,7 @@ function TablaPagosPage() {
   const [lastName, setLastName] = useState("");
   const [amount, setAmount] = useState(50000);
   const [years, setYears] = useState<TermYears>(4);
+  const [startDate, setStartDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [busy, setBusy] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -45,7 +46,7 @@ function TablaPagosPage() {
           </p>
         </header>
 
-        <div className="grid gap-4 rounded-2xl border border-border bg-card p-6 shadow-card-soft sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 rounded-2xl border border-border bg-card p-6 shadow-card-soft sm:grid-cols-2 lg:grid-cols-5">
           <Field label="Nombre"><input value={firstName} onChange={(e) => setFirstName(e.target.value)} className={inputCls} /></Field>
           <Field label="Apellido"><input value={lastName} onChange={(e) => setLastName(e.target.value)} className={inputCls} /></Field>
           <Field label="Monto (MXN)">
@@ -58,7 +59,10 @@ function TablaPagosPage() {
               ))}
             </div>
           </Field>
-          <div className="sm:col-span-2 lg:col-span-4">
+          <Field label="Fecha de inicio">
+            <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className={inputCls} />
+          </Field>
+          <div className="sm:col-span-2 lg:col-span-5">
             <button
               onClick={exportPng}
               disabled={busy || !firstName || !lastName}
@@ -73,7 +77,7 @@ function TablaPagosPage() {
         <div className="overflow-hidden rounded-2xl border border-border bg-surface-alt p-4 shadow-card-soft">
           <div className="overflow-auto">
             <div style={{ transform: "scale(0.45)", transformOrigin: "top left", width: 1080, height: 1350 }}>
-              <PaymentScheduleDoc ref={ref} firstName={firstName} lastName={lastName} amount={amount} years={years} />
+              <PaymentScheduleDoc ref={ref} firstName={firstName} lastName={lastName} amount={amount} years={years} startDate={startDate} />
             </div>
           </div>
         </div>
@@ -94,20 +98,20 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-interface DocProps { firstName: string; lastName: string; amount: number; years: TermYears }
+interface DocProps { firstName: string; lastName: string; amount: number; years: TermYears; startDate: string }
 
-const PaymentScheduleDoc = forwardRef<HTMLDivElement, DocProps>(function PaymentScheduleDoc({ firstName, lastName, amount, years }, ref) {
+const PaymentScheduleDoc = forwardRef<HTMLDivElement, DocProps>(function PaymentScheduleDoc({ firstName, lastName, amount, years, startDate }, ref) {
   const pay = calculateMonthlyPayment(amount, years);
   const months = years * 12;
   const monthlyRate = INSTITUTION.annualRatePercent / 100 / 12;
-  const now = new Date();
+  const start = startDate ? new Date(startDate + "T00:00:00") : new Date();
   let balance = amount;
   const rows: { n: number; date: string; interest: number; principal: number; balance: number }[] = [];
   for (let i = 1; i <= months; i++) {
     const interest = Math.round(balance * monthlyRate);
     const principal = pay.cuota - interest;
     balance = Math.max(0, balance - principal);
-    const d = new Date(now.getFullYear(), now.getMonth() + i, now.getDate());
+    const d = new Date(start.getFullYear(), start.getMonth() + i, start.getDate());
     rows.push({
       n: i,
       date: d.toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric" }),

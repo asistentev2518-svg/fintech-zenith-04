@@ -92,7 +92,15 @@ function GeneradorPage() {
               <input value={master.name} onChange={(e) => set("name", e.target.value)} className={inputCls} placeholder="Nombre completo" />
             </Field>
             <Field label="Ejecutivo asignado">
-              <input value={master.executive} onChange={(e) => set("executive", e.target.value)} className={inputCls} />
+              <select
+                value={master.executive}
+                onChange={(e) => set("executive", e.target.value)}
+                className={inputCls}
+              >
+                <option value="Ely Garcia">Ely Garcia</option>
+                <option value="Adela Tapia">Adela Tapia</option>
+                <option value="Maritza Lopez">Maritza Lopez</option>
+              </select>
             </Field>
             <Field label="Monto aprobado (MXN)">
               <input
