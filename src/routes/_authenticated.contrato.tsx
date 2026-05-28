@@ -227,35 +227,25 @@ const PageOne = forwardRef<HTMLDivElement, { s: State }>(function PageOne({ s },
 
         <SectionLabel n="2" title="DATOS DEL FINANCIAMIENTO" />
         <div style={{ border: "1px solid #e2e8f0", borderRadius: 10, padding: "16px 20px", marginBottom: 14 }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 18, textAlign: "center" }}>
-            <div>
-              <Mini label="MONTO SOLICITADO" />
-              <div style={{ fontFamily: "'Manrope', sans-serif", fontWeight: 800, fontSize: 20, color: "#0B2A5B", marginTop: 4 }}>{formatMXN(s.amount)}</div>
-            </div>
-            <div>
-              <Mini label="TASA ANUAL ORDINARIA FIJA" />
-              <div style={{ fontFamily: "'Manrope', sans-serif", fontWeight: 800, fontSize: 24, color: "#1266D6", marginTop: 2 }}>{INSTITUTION.annualRatePercent}%</div>
-              <div style={{ fontSize: 10, color: "#1266D6", fontWeight: 700 }}>ANUAL FIJA</div>
-            </div>
-            <div>
-              <Mini label="PLAZO EN AÑOS" />
-              <div style={{ fontFamily: "'Manrope', sans-serif", fontWeight: 800, fontSize: 20, color: "#0B2A5B", marginTop: 4 }}>{s.termYears} años</div>
-            </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 18 }}>
+            <Row label="MONTO SOLICITADO" value="" mono />
+            <Row label="TASA ANUAL ORDINARIA FIJA" value={`${INSTITUTION.annualRatePercent}%`} />
+            <Row label="PLAZO EN AÑOS" value="" />
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18, marginTop: 14, paddingTop: 14, borderTop: "1px dashed #e2e8f0" }}>
-            <Row label="FECHA DE OTORGAMIENTO" value={s.fechaOtorgamiento} mono />
-            <Row label="FECHA ESTIMADA DE VENCIMIENTO" value={s.fechaVencimiento} mono />
+            <Row label="FECHA DE OTORGAMIENTO" value="" mono />
+            <Row label="FECHA ESTIMADA DE VENCIMIENTO" value="" mono />
           </div>
           <p style={{ marginTop: 10, marginBottom: 0, fontSize: 10.5, color: "#64748b", fontStyle: "italic" }}>
-            ⓘ La tasa anual ordinaria fija del {INSTITUTION.annualRatePercent}% es fija durante toda la vigencia del contrato. Pago mensual estimado: <strong>{formatMXN(calculateMonthlyPayment(s.amount, s.termYears).cuota)}</strong>.
+            ⓘ Espacios destinados para llenado manual con bolígrafo. La tasa anual ordinaria fija del {INSTITUTION.annualRatePercent}% es fija durante toda la vigencia del contrato.
           </p>
         </div>
 
         <SectionLabel n="3" title="DATOS BANCARIOS" />
         <div style={{ border: "1px solid #e2e8f0", borderRadius: 10, padding: "16px 20px", marginBottom: 14 }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
-            <Row label="CUENTA A ACREDITAR" value={s.bankAccount} mono />
-            <Row label="NOMBRE DEL BANCO" value={s.bankName} />
+            <Row label="CUENTA A ACREDITAR" value="" mono />
+            <Row label="NOMBRE DEL BANCO" value="" />
           </div>
         </div>
 
