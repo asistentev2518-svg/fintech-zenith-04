@@ -48,25 +48,14 @@ type State = {
   phone: string;
   income: string;
   address: string;
-  amount: number;
-  termYears: TermYears;
-  bankAccount: string;
-  bankName: string;
-  fechaOtorgamiento: string;
-  fechaVencimiento: string;
   clauses: typeof DEFAULTS;
 };
 
 function defaultState(): State {
   const today = new Date();
-  const end = new Date(today.getFullYear() + 4, today.getMonth(), today.getDate());
-  const fmt = (d: Date) => d.toLocaleDateString("es-MX", { day: "2-digit", month: "2-digit", year: "numeric" });
   return {
     folio: `IG-${today.getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
     fullName: "", curp: "", sexo: "Masculino", phone: "", income: "", address: "",
-    amount: 50000, termYears: 4,
-    bankAccount: "", bankName: "",
-    fechaOtorgamiento: fmt(today), fechaVencimiento: fmt(end),
     clauses: { ...DEFAULTS },
   };
 }
