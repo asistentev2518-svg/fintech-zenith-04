@@ -1,4 +1,4 @@
-import html2canvas from "html2canvas";
+import html2canvas from "html2canvas-pro";
 
 /**
  * Renderiza un nodo HTML como PNG con dimensiones exactas (formato institucional).
