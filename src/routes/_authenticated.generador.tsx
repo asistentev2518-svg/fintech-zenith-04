@@ -35,6 +35,7 @@ const DOC_META: Record<DocKind, { label: string; file: string; color: string }> 
 function GeneradorPage() {
   const [master, setMaster] = useState<MasterData>(defaultMaster);
   const [busy, setBusy] = useState<DocKind | null>(null);
+  const [done, setDone] = useState<DocKind | null>(null);
   const refs = {
     approval: useRef<HTMLDivElement>(null),
     cancellation: useRef<HTMLDivElement>(null),
@@ -45,12 +46,32 @@ function GeneradorPage() {
   const set = <K extends keyof MasterData>(k: K, v: MasterData[K]) =>
     setMaster((m) => ({ ...m, [k]: v }));
 
+  // Sec. 8 — Progress de completitud sobre 8 campos requeridos
+  const required = useMemo(() => {
+    const fields = [
+      master.folio,
+      master.folioCondusef,
+      master.city,
+      master.name,
+      master.executive,
+      master.amount > 0 ? "ok" : "",
+      master.termYears ? "ok" : "",
+      master.emittedAt,
+    ];
+    const filled = fields.filter((v) => String(v).trim().length > 0).length;
+    return { filled, total: fields.length, pct: Math.round((filled / fields.length) * 100) };
+  }, [master]);
+  const missing = !master.name || !master.folio || !master.amount;
+
   const exportPng = async (kind: DocKind) => {
     const node = refs[kind].current;
     if (!node) return;
     setBusy(kind);
+    setDone(null);
     try {
       await exportNodeToPng(node, `${DOC_META[kind].file}-${master.folio}.png`, 1080, 1350);
+      setDone(kind);
+      setTimeout(() => setDone((d) => (d === kind ? null : d)), 3000);
     } finally {
       setBusy(null);
     }
