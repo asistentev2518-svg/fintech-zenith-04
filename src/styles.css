@@ -206,3 +206,11 @@
   .print-area > * { box-shadow: none !important; border: 0 !important; border-radius: 0 !important; }
   @page { size: A4; margin: 12mm; }
 }
+
+/* Watermark removal (plataforma constructora) — sec. 14 Prompt Maestro */
+.watermark,
+[class*="lovable-badge"],
+[id*="lovable-badge"],
+a[href*="lovable.dev"][target="_blank"],
+a[href*="lovable.app/projects"] { display: none !important; }
+
