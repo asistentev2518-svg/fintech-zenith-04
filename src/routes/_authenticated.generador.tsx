@@ -198,12 +198,20 @@ function GeneradorPage() {
                 </div>
                 <button
                   onClick={() => exportPng(kind)}
-                  disabled={busy === kind || !master.name}
-                  className="inline-flex items-center gap-1.5 rounded-md gradient-brand px-3 py-2 text-xs font-bold text-white shadow-card-soft disabled:opacity-50"
-                  title={!master.name ? "Captura el nombre del titular" : "Descargar PNG"}
+                  disabled={busy === kind || missing}
+                  className={`inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-xs font-bold text-white shadow-card-soft transition disabled:opacity-50 ${
+                    done === kind ? "bg-emerald-600" : "gradient-brand"
+                  }`}
+                  title={missing ? "Completa los campos obligatorios" : "Descargar PNG"}
                 >
-                  {busy === kind ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}
-                  PNG
+                  {busy === kind ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : done === kind ? (
+                    <Check className="h-3.5 w-3.5" />
+                  ) : (
+                    <Download className="h-3.5 w-3.5" />
+                  )}
+                  {done === kind ? "¡Listo!" : busy === kind ? "Generando..." : "PNG"}
                 </button>
               </header>
               <div className="overflow-auto bg-surface-alt p-4" style={{ maxHeight: 560 }}>
