@@ -164,9 +164,22 @@ function GeneradorPage() {
               <input value={master.emittedAt} onChange={(e) => set("emittedAt", e.target.value)} className={inputCls} />
             </Field>
           </div>
-          <p className="mt-4 text-[11px] text-muted-foreground">
-            Tasa anual fija {INSTITUTION.annualRatePercent}% · Cuota y total se calculan automáticamente con la fórmula oficial.
-          </p>
+          <div className="mt-5 flex items-center justify-between text-[11px] text-muted-foreground">
+            <span>Tasa anual fija {INSTITUTION.annualRatePercent}% · Cuota y total se calculan automáticamente.</span>
+            <span className="font-bold tabular-nums">{required.filled} / {required.total} campos completados</span>
+          </div>
+          <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-surface-alt">
+            <div
+              className="h-full rounded-full bg-action transition-all duration-500"
+              style={{ width: `${required.pct}%` }}
+            />
+          </div>
+          {missing && (
+            <div className="mt-4 flex items-start gap-2 rounded-md border border-amber-300/60 bg-amber-50 p-3 text-xs text-amber-800">
+              <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+              <span>Completa los campos obligatorios (titular, folio y monto) antes de descargar los documentos.</span>
+            </div>
+          )}
         </section>
 
         {/* Grid de docs */}
