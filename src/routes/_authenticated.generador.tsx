@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useRef, useState } from "react";
-import { Download, FileImage, Loader2, RefreshCw } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
+import { AlertTriangle, Check, Download, FileImage, Loader2, RefreshCw } from "lucide-react";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { defaultMaster, type MasterData } from "@/components/dashboard/shared";
 import { ApprovalDoc } from "@/components/generator/approval-doc";
