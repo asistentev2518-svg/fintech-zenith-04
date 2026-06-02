@@ -63,14 +63,22 @@ function TablaPagosPage() {
           <Field label="Fecha de inicio">
             <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className={inputCls} />
           </Field>
-          <div className="sm:col-span-2 lg:col-span-5">
+          <div className="flex flex-wrap gap-3 sm:col-span-2 lg:col-span-5">
+            <button
+              onClick={() => exportPaymentSchedulePdf({ firstName, lastName, amount, years, startDate })}
+              disabled={!firstName || !lastName}
+              className="inline-flex h-12 items-center gap-2 rounded-md gradient-brand px-5 text-sm font-bold text-white shadow-card-soft disabled:opacity-50"
+            >
+              <FileText className="h-4 w-4" />
+              Descargar PDF (vectorial)
+            </button>
             <button
               onClick={exportPng}
               disabled={busy || !firstName || !lastName}
-              className="inline-flex h-12 items-center gap-2 rounded-md gradient-brand px-5 text-sm font-bold text-white shadow-card-soft disabled:opacity-50"
+              className="inline-flex h-12 items-center gap-2 rounded-md bg-surface px-5 text-sm font-bold text-institutional border border-border shadow-card-soft disabled:opacity-50 hover:bg-accent"
             >
               {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-              Descargar PNG 1080×1350
+              Descargar PNG
             </button>
           </div>
         </div>
