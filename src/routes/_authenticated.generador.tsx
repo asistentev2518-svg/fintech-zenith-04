@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useRef, useState } from "react";
-import { Download, FileImage, Loader2, RefreshCw } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
+import { AlertTriangle, Check, Download, FileImage, Loader2, RefreshCw } from "lucide-react";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { defaultMaster, type MasterData } from "@/components/dashboard/shared";
 import { ApprovalDoc } from "@/components/generator/approval-doc";
@@ -35,6 +35,7 @@ const DOC_META: Record<DocKind, { label: string; file: string; color: string }> 
 function GeneradorPage() {
   const [master, setMaster] = useState<MasterData>(defaultMaster);
   const [busy, setBusy] = useState<DocKind | null>(null);
+  const [done, setDone] = useState<DocKind | null>(null);
   const refs = {
     approval: useRef<HTMLDivElement>(null),
     cancellation: useRef<HTMLDivElement>(null),
@@ -45,12 +46,32 @@ function GeneradorPage() {
   const set = <K extends keyof MasterData>(k: K, v: MasterData[K]) =>
     setMaster((m) => ({ ...m, [k]: v }));
 
+  // Sec. 8 — Progress de completitud sobre 8 campos requeridos
+  const required = useMemo(() => {
+    const fields = [
+      master.folio,
+      master.folioCondusef,
+      master.city,
+      master.name,
+      master.executive,
+      master.amount > 0 ? "ok" : "",
+      master.termYears ? "ok" : "",
+      master.emittedAt,
+    ];
+    const filled = fields.filter((v) => String(v).trim().length > 0).length;
+    return { filled, total: fields.length, pct: Math.round((filled / fields.length) * 100) };
+  }, [master]);
+  const missing = !master.name || !master.folio || !master.amount;
+
   const exportPng = async (kind: DocKind) => {
     const node = refs[kind].current;
     if (!node) return;
     setBusy(kind);
+    setDone(null);
     try {
       await exportNodeToPng(node, `${DOC_META[kind].file}-${master.folio}.png`, 1080, 1350);
+      setDone(kind);
+      setTimeout(() => setDone((d) => (d === kind ? null : d)), 3000);
     } finally {
       setBusy(null);
     }
@@ -143,9 +164,22 @@ function GeneradorPage() {
               <input value={master.emittedAt} onChange={(e) => set("emittedAt", e.target.value)} className={inputCls} />
             </Field>
           </div>
-          <p className="mt-4 text-[11px] text-muted-foreground">
-            Tasa anual fija {INSTITUTION.annualRatePercent}% · Cuota y total se calculan automáticamente con la fórmula oficial.
-          </p>
+          <div className="mt-5 flex items-center justify-between text-[11px] text-muted-foreground">
+            <span>Tasa anual fija {INSTITUTION.annualRatePercent}% · Cuota y total se calculan automáticamente.</span>
+            <span className="font-bold tabular-nums">{required.filled} / {required.total} campos completados</span>
+          </div>
+          <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-surface-alt">
+            <div
+              className="h-full rounded-full bg-action transition-all duration-500"
+              style={{ width: `${required.pct}%` }}
+            />
+          </div>
+          {missing && (
+            <div className="mt-4 flex items-start gap-2 rounded-md border border-amber-300/60 bg-amber-50 p-3 text-xs text-amber-800">
+              <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+              <span>Completa los campos obligatorios (titular, folio y monto) antes de descargar los documentos.</span>
+            </div>
+          )}
         </section>
 
         {/* Grid de docs */}
@@ -164,12 +198,20 @@ function GeneradorPage() {
                 </div>
                 <button
                   onClick={() => exportPng(kind)}
-                  disabled={busy === kind || !master.name}
-                  className="inline-flex items-center gap-1.5 rounded-md gradient-brand px-3 py-2 text-xs font-bold text-white shadow-card-soft disabled:opacity-50"
-                  title={!master.name ? "Captura el nombre del titular" : "Descargar PNG"}
+                  disabled={busy === kind || missing}
+                  className={`inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-xs font-bold text-white shadow-card-soft transition disabled:opacity-50 ${
+                    done === kind ? "bg-emerald-600" : "gradient-brand"
+                  }`}
+                  title={missing ? "Completa los campos obligatorios" : "Descargar PNG"}
                 >
-                  {busy === kind ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}
-                  PNG
+                  {busy === kind ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : done === kind ? (
+                    <Check className="h-3.5 w-3.5" />
+                  ) : (
+                    <Download className="h-3.5 w-3.5" />
+                  )}
+                  {done === kind ? "¡Listo!" : busy === kind ? "Generando..." : "PNG"}
                 </button>
               </header>
               <div className="overflow-auto bg-surface-alt p-4" style={{ maxHeight: 560 }}>
