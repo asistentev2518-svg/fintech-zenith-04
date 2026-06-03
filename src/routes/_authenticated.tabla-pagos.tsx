@@ -1,10 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { forwardRef, useRef, useState } from "react";
-import { Download, Loader2, FileText } from "lucide-react";
+import { FileText } from "lucide-react";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { ALLOWED_TERMS, calculateMonthlyPayment, formatMXN, type TermYears } from "@/lib/finance";
 import { INSTITUTION, ASSETS } from "@/lib/config";
-import { exportNodeToPng } from "@/lib/png-export";
 import { exportPaymentSchedulePdf } from "@/lib/payment-pdf";
 
 export const Route = createFileRoute("/_authenticated/tabla-pagos")({
@@ -23,18 +22,7 @@ function TablaPagosPage() {
   const [amount, setAmount] = useState(50000);
   const [years, setYears] = useState<TermYears>(4);
   const [startDate, setStartDate] = useState(() => new Date().toISOString().slice(0, 10));
-  const [busy, setBusy] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-
-  const exportPng = async () => {
-    if (!ref.current) return;
-    setBusy(true);
-    try {
-      await exportNodeToPng(ref.current, `tabla-pagos-${lastName || "cliente"}.png`, 1080, 1350);
-    } finally {
-      setBusy(false);
-    }
-  };
 
   return (
     <DashboardShell>
