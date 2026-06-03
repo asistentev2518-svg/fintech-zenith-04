@@ -1,13 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
-import { AlertTriangle, Check, Download, FileImage, Loader2, RefreshCw } from "lucide-react";
+import { AlertTriangle, Check, FileText, Loader2, RefreshCw } from "lucide-react";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { defaultMaster, type MasterData } from "@/components/dashboard/shared";
 import { ApprovalDoc } from "@/components/generator/approval-doc";
 import { CancellationDoc } from "@/components/generator/cancellation-doc";
 import { PolicyDoc } from "@/components/generator/policy-doc";
 import { PrivacyDoc } from "@/components/generator/privacy-doc";
-import { exportNodeToPng } from "@/lib/png-export";
+import { exportInstitutionalPdf } from "@/lib/pdf-vector";
 import { INSTITUTION } from "@/lib/config";
 import type { TermYears } from "@/lib/finance";
 
@@ -23,13 +23,13 @@ export const Route = createFileRoute("/_authenticated/generador")({
 
 const TERMS: TermYears[] = [2, 4, 6, 8];
 
-type DocKind = "approval" | "cancellation" | "policy" | "privacy";
+type DocKind = "aprobacion" | "cancelacion" | "poliza" | "privacidad";
 
-const DOC_META: Record<DocKind, { label: string; file: string; color: string }> = {
-  approval:     { label: "Aprobación de crédito",  file: "aprobacion",     color: "var(--success)" },
-  cancellation: { label: "Cancelación de crédito", file: "cancelacion",    color: "var(--danger)"  },
-  policy:       { label: "Póliza de protección",   file: "poliza",         color: "var(--brand)"   },
-  privacy:      { label: "Aviso de privacidad",    file: "aviso-privacidad", color: "var(--brand)" },
+const DOC_META: Record<DocKind, { label: string; color: string }> = {
+  aprobacion:  { label: "Constancia de aprobación",   color: "var(--success)" },
+  cancelacion: { label: "Notificación de cancelación", color: "var(--danger)" },
+  poliza:      { label: "Póliza de protección",        color: "var(--brand)" },
+  privacidad:  { label: "Aviso de privacidad",         color: "var(--brand)" },
 };
 
 function GeneradorPage() {
@@ -37,16 +37,15 @@ function GeneradorPage() {
   const [busy, setBusy] = useState<DocKind | null>(null);
   const [done, setDone] = useState<DocKind | null>(null);
   const refs = {
-    approval: useRef<HTMLDivElement>(null),
-    cancellation: useRef<HTMLDivElement>(null),
-    policy: useRef<HTMLDivElement>(null),
-    privacy: useRef<HTMLDivElement>(null),
+    aprobacion: useRef<HTMLDivElement>(null),
+    cancelacion: useRef<HTMLDivElement>(null),
+    poliza: useRef<HTMLDivElement>(null),
+    privacidad: useRef<HTMLDivElement>(null),
   };
 
   const set = <K extends keyof MasterData>(k: K, v: MasterData[K]) =>
     setMaster((m) => ({ ...m, [k]: v }));
 
-  // Sec. 8 — Progress de completitud sobre 8 campos requeridos
   const required = useMemo(() => {
     const fields = [
       master.folio,
@@ -63,13 +62,11 @@ function GeneradorPage() {
   }, [master]);
   const missing = !master.name || !master.folio || !master.amount;
 
-  const exportPng = async (kind: DocKind) => {
-    const node = refs[kind].current;
-    if (!node) return;
+  const exportPdf = async (kind: DocKind) => {
     setBusy(kind);
     setDone(null);
     try {
-      await exportNodeToPng(node, `${DOC_META[kind].file}-${master.folio}.png`, 1080, 1350);
+      await Promise.resolve(exportInstitutionalPdf(kind, master));
       setDone(kind);
       setTimeout(() => setDone((d) => (d === kind ? null : d)), 3000);
     } finally {
