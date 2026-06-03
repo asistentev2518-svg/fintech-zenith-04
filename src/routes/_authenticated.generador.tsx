@@ -1,13 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
-import { AlertTriangle, Check, Download, FileImage, Loader2, RefreshCw } from "lucide-react";
+import { AlertTriangle, Check, FileText, Loader2, RefreshCw } from "lucide-react";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { defaultMaster, type MasterData } from "@/components/dashboard/shared";
 import { ApprovalDoc } from "@/components/generator/approval-doc";
 import { CancellationDoc } from "@/components/generator/cancellation-doc";
 import { PolicyDoc } from "@/components/generator/policy-doc";
 import { PrivacyDoc } from "@/components/generator/privacy-doc";
-import { exportNodeToPng } from "@/lib/png-export";
+import { exportInstitutionalPdf } from "@/lib/pdf-vector";
 import { INSTITUTION } from "@/lib/config";
 import type { TermYears } from "@/lib/finance";
 
@@ -23,13 +23,13 @@ export const Route = createFileRoute("/_authenticated/generador")({
 
 const TERMS: TermYears[] = [2, 4, 6, 8];
 
-type DocKind = "approval" | "cancellation" | "policy" | "privacy";
+type DocKind = "aprobacion" | "cancelacion" | "poliza" | "privacidad";
 
-const DOC_META: Record<DocKind, { label: string; file: string; color: string }> = {
-  approval:     { label: "Aprobación de crédito",  file: "aprobacion",     color: "var(--success)" },
-  cancellation: { label: "Cancelación de crédito", file: "cancelacion",    color: "var(--danger)"  },
-  policy:       { label: "Póliza de protección",   file: "poliza",         color: "var(--brand)"   },
-  privacy:      { label: "Aviso de privacidad",    file: "aviso-privacidad", color: "var(--brand)" },
+const DOC_META: Record<DocKind, { label: string; color: string }> = {
+  aprobacion:  { label: "Constancia de aprobación",   color: "var(--success)" },
+  cancelacion: { label: "Notificación de cancelación", color: "var(--danger)" },
+  poliza:      { label: "Póliza de protección",        color: "var(--brand)" },
+  privacidad:  { label: "Aviso de privacidad",         color: "var(--brand)" },
 };
 
 function GeneradorPage() {
@@ -37,16 +37,15 @@ function GeneradorPage() {
   const [busy, setBusy] = useState<DocKind | null>(null);
   const [done, setDone] = useState<DocKind | null>(null);
   const refs = {
-    approval: useRef<HTMLDivElement>(null),
-    cancellation: useRef<HTMLDivElement>(null),
-    policy: useRef<HTMLDivElement>(null),
-    privacy: useRef<HTMLDivElement>(null),
+    aprobacion: useRef<HTMLDivElement>(null),
+    cancelacion: useRef<HTMLDivElement>(null),
+    poliza: useRef<HTMLDivElement>(null),
+    privacidad: useRef<HTMLDivElement>(null),
   };
 
   const set = <K extends keyof MasterData>(k: K, v: MasterData[K]) =>
     setMaster((m) => ({ ...m, [k]: v }));
 
-  // Sec. 8 — Progress de completitud sobre 8 campos requeridos
   const required = useMemo(() => {
     const fields = [
       master.folio,
@@ -63,13 +62,11 @@ function GeneradorPage() {
   }, [master]);
   const missing = !master.name || !master.folio || !master.amount;
 
-  const exportPng = async (kind: DocKind) => {
-    const node = refs[kind].current;
-    if (!node) return;
+  const exportPdf = async (kind: DocKind) => {
     setBusy(kind);
     setDone(null);
     try {
-      await exportNodeToPng(node, `${DOC_META[kind].file}-${master.folio}.png`, 1080, 1350);
+      await Promise.resolve(exportInstitutionalPdf(kind, master));
       setDone(kind);
       setTimeout(() => setDone((d) => (d === kind ? null : d)), 3000);
     } finally {
@@ -189,37 +186,37 @@ function GeneradorPage() {
               <header className="flex items-center justify-between gap-3 border-b border-border bg-surface-alt px-5 py-4">
                 <div className="flex items-center gap-2.5">
                   <span className="grid h-9 w-9 place-items-center rounded-md text-white" style={{ background: DOC_META[kind].color }}>
-                    <FileImage className="h-4 w-4" />
+                    <FileText className="h-4 w-4" />
                   </span>
                   <div>
                     <h3 className="text-sm font-black text-institutional">{DOC_META[kind].label}</h3>
-                    <p className="text-[11px] text-muted-foreground">1080 × 1350 px · PNG</p>
+                    <p className="text-[11px] text-muted-foreground">PDF vectorial · texto seleccionable · Letter</p>
                   </div>
                 </div>
                 <button
-                  onClick={() => exportPng(kind)}
+                  onClick={() => exportPdf(kind)}
                   disabled={busy === kind || missing}
                   className={`inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-xs font-bold text-white shadow-card-soft transition disabled:opacity-50 ${
                     done === kind ? "bg-emerald-600" : "gradient-brand"
                   }`}
-                  title={missing ? "Completa los campos obligatorios" : "Descargar PNG"}
+                  title={missing ? "Completa los campos obligatorios" : "Descargar PDF"}
                 >
                   {busy === kind ? (
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
                   ) : done === kind ? (
                     <Check className="h-3.5 w-3.5" />
                   ) : (
-                    <Download className="h-3.5 w-3.5" />
+                    <FileText className="h-3.5 w-3.5" />
                   )}
-                  {done === kind ? "¡Listo!" : busy === kind ? "Generando..." : "PNG"}
+                  {done === kind ? "¡PDF listo!" : busy === kind ? "Generando..." : "Descargar PDF"}
                 </button>
               </header>
               <div className="overflow-auto bg-surface-alt p-4" style={{ maxHeight: 560 }}>
                 <div style={{ transform: "scale(0.42)", transformOrigin: "top left", width: 1080, height: 1350 }}>
-                  {kind === "approval"     && <ApprovalDoc     ref={refs.approval}     master={master} />}
-                  {kind === "cancellation" && <CancellationDoc ref={refs.cancellation} master={master} />}
-                  {kind === "policy"       && <PolicyDoc       ref={refs.policy}       master={master} />}
-                  {kind === "privacy"      && <PrivacyDoc      ref={refs.privacy}      master={master} />}
+                  {kind === "aprobacion"  && <ApprovalDoc     ref={refs.aprobacion}  master={master} />}
+                  {kind === "cancelacion" && <CancellationDoc ref={refs.cancelacion} master={master} />}
+                  {kind === "poliza"      && <PolicyDoc       ref={refs.poliza}      master={master} />}
+                  {kind === "privacidad"  && <PrivacyDoc      ref={refs.privacidad}  master={master} />}
                 </div>
               </div>
             </article>

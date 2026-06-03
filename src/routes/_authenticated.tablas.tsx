@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { Download, Loader2, TableProperties } from "lucide-react";
+import { FileText } from "lucide-react";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { ALLOWED_TERMS, buildSimulationTable, formatMXN } from "@/lib/finance";
 import { INSTITUTION, ASSETS } from "@/lib/config";
-import { exportNodeToPng } from "@/lib/png-export";
+import { exportTablaMontosPdf } from "@/lib/pdf-vector";
 
 export const Route = createFileRoute("/_authenticated/tablas")({
   head: () => ({
@@ -18,19 +18,10 @@ export const Route = createFileRoute("/_authenticated/tablas")({
 
 function TablasPage() {
   const [amount, setAmount] = useState(10000);
-  const [busy, setBusy] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const rows = buildSimulationTable(amount);
 
-  const exportPng = async () => {
-    if (!ref.current) return;
-    setBusy(true);
-    try {
-      await exportNodeToPng(ref.current, `tabla-montos-${amount}.png`, 1080, 1080);
-    } finally {
-      setBusy(false);
-    }
-  };
+  const exportPdf = () => exportTablaMontosPdf(amount, rows);
 
   return (
     <DashboardShell>
@@ -59,12 +50,11 @@ function TablasPage() {
               />
             </div>
             <button
-              onClick={exportPng}
-              disabled={busy}
-              className="inline-flex h-12 items-center gap-2 rounded-md gradient-brand px-5 text-sm font-bold text-white shadow-card-soft disabled:opacity-60"
+              onClick={exportPdf}
+              className="inline-flex h-12 items-center gap-2 rounded-md gradient-brand px-5 text-sm font-bold text-white shadow-card-soft"
             >
-              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-              Descargar PNG
+              <FileText className="h-4 w-4" />
+              Descargar PDF
             </button>
           </div>
         </div>
