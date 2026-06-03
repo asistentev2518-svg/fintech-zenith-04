@@ -60,14 +60,6 @@ function TablaPagosPage() {
               <FileText className="h-4 w-4" />
               Descargar PDF (vectorial)
             </button>
-            <button
-              onClick={exportPng}
-              disabled={busy || !firstName || !lastName}
-              className="inline-flex h-12 items-center gap-2 rounded-md bg-surface px-5 text-sm font-bold text-institutional border border-border shadow-card-soft disabled:opacity-50 hover:bg-accent"
-            >
-              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-              Descargar PNG
-            </button>
           </div>
         </div>
 
