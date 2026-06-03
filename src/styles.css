@@ -1,7 +1,7 @@
 @import "tailwindcss" source(none);
-@source "../src";
 @import "tw-animate-css";
 @import url("https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=JetBrains+Mono:wght@500;700&family=Manrope:wght@600;700;800&display=swap");
+@source "../src";
 
 @custom-variant dark (&:is(.dark *));
 
