@@ -186,37 +186,37 @@ function GeneradorPage() {
               <header className="flex items-center justify-between gap-3 border-b border-border bg-surface-alt px-5 py-4">
                 <div className="flex items-center gap-2.5">
                   <span className="grid h-9 w-9 place-items-center rounded-md text-white" style={{ background: DOC_META[kind].color }}>
-                    <FileImage className="h-4 w-4" />
+                    <FileText className="h-4 w-4" />
                   </span>
                   <div>
                     <h3 className="text-sm font-black text-institutional">{DOC_META[kind].label}</h3>
-                    <p className="text-[11px] text-muted-foreground">1080 × 1350 px · PNG</p>
+                    <p className="text-[11px] text-muted-foreground">PDF vectorial · texto seleccionable · Letter</p>
                   </div>
                 </div>
                 <button
-                  onClick={() => exportPng(kind)}
+                  onClick={() => exportPdf(kind)}
                   disabled={busy === kind || missing}
                   className={`inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-xs font-bold text-white shadow-card-soft transition disabled:opacity-50 ${
                     done === kind ? "bg-emerald-600" : "gradient-brand"
                   }`}
-                  title={missing ? "Completa los campos obligatorios" : "Descargar PNG"}
+                  title={missing ? "Completa los campos obligatorios" : "Descargar PDF"}
                 >
                   {busy === kind ? (
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
                   ) : done === kind ? (
                     <Check className="h-3.5 w-3.5" />
                   ) : (
-                    <Download className="h-3.5 w-3.5" />
+                    <FileText className="h-3.5 w-3.5" />
                   )}
-                  {done === kind ? "¡Listo!" : busy === kind ? "Generando..." : "PNG"}
+                  {done === kind ? "¡PDF listo!" : busy === kind ? "Generando..." : "Descargar PDF"}
                 </button>
               </header>
               <div className="overflow-auto bg-surface-alt p-4" style={{ maxHeight: 560 }}>
                 <div style={{ transform: "scale(0.42)", transformOrigin: "top left", width: 1080, height: 1350 }}>
-                  {kind === "approval"     && <ApprovalDoc     ref={refs.approval}     master={master} />}
-                  {kind === "cancellation" && <CancellationDoc ref={refs.cancellation} master={master} />}
-                  {kind === "policy"       && <PolicyDoc       ref={refs.policy}       master={master} />}
-                  {kind === "privacy"      && <PrivacyDoc      ref={refs.privacy}      master={master} />}
+                  {kind === "aprobacion"  && <ApprovalDoc     ref={refs.aprobacion}  master={master} />}
+                  {kind === "cancelacion" && <CancellationDoc ref={refs.cancelacion} master={master} />}
+                  {kind === "poliza"      && <PolicyDoc       ref={refs.poliza}      master={master} />}
+                  {kind === "privacidad"  && <PrivacyDoc      ref={refs.privacidad}  master={master} />}
                 </div>
               </div>
             </article>
