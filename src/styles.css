@@ -93,8 +93,8 @@
   --accent-foreground: var(--institutional);
   --destructive: var(--danger);
   --destructive-foreground: oklch(0.985 0.003 247);
-  --border: oklch(0.92 0.012 256);
-  --input: oklch(0.92 0.012 256);
+  --border: oklch(0.72 0.025 257);
+  --input: oklch(0.72 0.025 257);
   --ring: var(--action);
 
   --sidebar: oklch(1 0 0);
