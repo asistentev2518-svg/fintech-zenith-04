@@ -8,5 +8,9 @@ export const Route = createFileRoute("/_authenticated")({
       throw redirect({ to: "/login" });
     }
   },
-  component: () => <Outlet />,
+  component: () => (
+    <div className="dark">
+      <Outlet />
+    </div>
+  ),
 });
