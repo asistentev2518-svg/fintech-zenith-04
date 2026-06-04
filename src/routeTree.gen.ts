@@ -26,6 +26,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedContratosRouteImport } from './routes/_authenticated.contratos'
 import { Route as AuthenticatedContratoRouteImport } from './routes/_authenticated.contrato'
 import { Route as AuthenticatedConfiguracionRouteImport } from './routes/_authenticated.configuracion'
+import { Route as AuthenticatedExpedientesFolioRouteImport } from './routes/_authenticated.expedientes.$folio'
 
 const TerminosYCondicionesRoute = TerminosYCondicionesRouteImport.update({
   id: '/terminos-y-condiciones',
@@ -113,6 +114,12 @@ const AuthenticatedConfiguracionRoute =
     path: '/configuracion',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedExpedientesFolioRoute =
+  AuthenticatedExpedientesFolioRouteImport.update({
+    id: '/$folio',
+    path: '/$folio',
+    getParentRoute: () => AuthenticatedExpedientesRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -126,11 +133,12 @@ export interface FileRoutesByFullPath {
   '/contrato': typeof AuthenticatedContratoRoute
   '/contratos': typeof AuthenticatedContratosRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/expedientes': typeof AuthenticatedExpedientesRoute
+  '/expedientes': typeof AuthenticatedExpedientesRouteWithChildren
   '/generador': typeof AuthenticatedGeneradorRoute
   '/tabla-pagos': typeof AuthenticatedTablaPagosRoute
   '/tablas': typeof AuthenticatedTablasRoute
   '/validar/$folio': typeof ValidarFolioRoute
+  '/expedientes/$folio': typeof AuthenticatedExpedientesFolioRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -144,11 +152,12 @@ export interface FileRoutesByTo {
   '/contrato': typeof AuthenticatedContratoRoute
   '/contratos': typeof AuthenticatedContratosRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/expedientes': typeof AuthenticatedExpedientesRoute
+  '/expedientes': typeof AuthenticatedExpedientesRouteWithChildren
   '/generador': typeof AuthenticatedGeneradorRoute
   '/tabla-pagos': typeof AuthenticatedTablaPagosRoute
   '/tablas': typeof AuthenticatedTablasRoute
   '/validar/$folio': typeof ValidarFolioRoute
+  '/expedientes/$folio': typeof AuthenticatedExpedientesFolioRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -164,11 +173,12 @@ export interface FileRoutesById {
   '/_authenticated/contrato': typeof AuthenticatedContratoRoute
   '/_authenticated/contratos': typeof AuthenticatedContratosRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/expedientes': typeof AuthenticatedExpedientesRoute
+  '/_authenticated/expedientes': typeof AuthenticatedExpedientesRouteWithChildren
   '/_authenticated/generador': typeof AuthenticatedGeneradorRoute
   '/_authenticated/tabla-pagos': typeof AuthenticatedTablaPagosRoute
   '/_authenticated/tablas': typeof AuthenticatedTablasRoute
   '/validar/$folio': typeof ValidarFolioRoute
+  '/_authenticated/expedientes/$folio': typeof AuthenticatedExpedientesFolioRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -189,6 +199,7 @@ export interface FileRouteTypes {
     | '/tabla-pagos'
     | '/tablas'
     | '/validar/$folio'
+    | '/expedientes/$folio'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -207,6 +218,7 @@ export interface FileRouteTypes {
     | '/tabla-pagos'
     | '/tablas'
     | '/validar/$folio'
+    | '/expedientes/$folio'
   id:
     | '__root__'
     | '/'
@@ -226,6 +238,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tabla-pagos'
     | '/_authenticated/tablas'
     | '/validar/$folio'
+    | '/_authenticated/expedientes/$folio'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -361,15 +374,36 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConfiguracionRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/expedientes/$folio': {
+      id: '/_authenticated/expedientes/$folio'
+      path: '/$folio'
+      fullPath: '/expedientes/$folio'
+      preLoaderRoute: typeof AuthenticatedExpedientesFolioRouteImport
+      parentRoute: typeof AuthenticatedExpedientesRoute
+    }
   }
 }
+
+interface AuthenticatedExpedientesRouteChildren {
+  AuthenticatedExpedientesFolioRoute: typeof AuthenticatedExpedientesFolioRoute
+}
+
+const AuthenticatedExpedientesRouteChildren: AuthenticatedExpedientesRouteChildren =
+  {
+    AuthenticatedExpedientesFolioRoute: AuthenticatedExpedientesFolioRoute,
+  }
+
+const AuthenticatedExpedientesRouteWithChildren =
+  AuthenticatedExpedientesRoute._addFileChildren(
+    AuthenticatedExpedientesRouteChildren,
+  )
 
 interface AuthenticatedRouteChildren {
   AuthenticatedConfiguracionRoute: typeof AuthenticatedConfiguracionRoute
   AuthenticatedContratoRoute: typeof AuthenticatedContratoRoute
   AuthenticatedContratosRoute: typeof AuthenticatedContratosRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedExpedientesRoute: typeof AuthenticatedExpedientesRoute
+  AuthenticatedExpedientesRoute: typeof AuthenticatedExpedientesRouteWithChildren
   AuthenticatedGeneradorRoute: typeof AuthenticatedGeneradorRoute
   AuthenticatedTablaPagosRoute: typeof AuthenticatedTablaPagosRoute
   AuthenticatedTablasRoute: typeof AuthenticatedTablasRoute
@@ -380,7 +414,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedContratoRoute: AuthenticatedContratoRoute,
   AuthenticatedContratosRoute: AuthenticatedContratosRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedExpedientesRoute: AuthenticatedExpedientesRoute,
+  AuthenticatedExpedientesRoute: AuthenticatedExpedientesRouteWithChildren,
   AuthenticatedGeneradorRoute: AuthenticatedGeneradorRoute,
   AuthenticatedTablaPagosRoute: AuthenticatedTablaPagosRoute,
   AuthenticatedTablasRoute: AuthenticatedTablasRoute,
@@ -404,3 +438,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
