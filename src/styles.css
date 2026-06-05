@@ -58,6 +58,7 @@
   --color-sidebar-ring: var(--sidebar-ring);
 
   --font-sans: "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-display: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
 }
 
 :root {
@@ -260,4 +261,148 @@
 [id*="lovable-badge"],
 a[href*="lovable.dev"][target="_blank"],
 a[href*="lovable.app/projects"] { display: none !important; }
+
+/* ─────────────────────────────────────────────────────────────
+   LANDING FUTURISTA — paleta literal del prompt (Parte 1)
+   bg #0A0E1A · surface #111827 · primary gradient #3B82F6→#60A5FA
+   Aplicado vía `.landing` scope para no afectar /dashboard.
+   ───────────────────────────────────────────────────────────── */
+.landing {
+  --lp-bg: #0A0E1A;
+  --lp-surface: #111827;
+  --lp-surface-2: #0F172A;
+  --lp-primary: #3B82F6;
+  --lp-primary-2: #60A5FA;
+  --lp-success: #10B981;
+  --lp-warning: #F59E0B;
+  --lp-danger: #EF4444;
+  --lp-pink: #EC4899;
+  --lp-text: #F9FAFB;
+  --lp-text-2: #9CA3AF;
+  --lp-text-3: #6B7280;
+  --lp-border: rgba(255,255,255,0.08);
+  --lp-border-2: rgba(255,255,255,0.12);
+  --lp-glass: rgba(255,255,255,0.04);
+
+  background: var(--lp-bg);
+  color: var(--lp-text);
+  font-family: "Inter", system-ui, sans-serif;
+}
+.landing h1, .landing h2, .landing h3, .landing .display {
+  font-family: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* Hero gradient mesh animado (loop 15s) */
+.landing-hero-bg {
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(30,58,95,0.85) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(59,130,246,0.55) 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 90%, rgba(96,165,250,0.30) 0%, transparent 45%),
+    #0A0E1A;
+  background-size: 200% 200%;
+  animation: lp-mesh 18s ease-in-out infinite;
+}
+@keyframes lp-mesh {
+  0%,100% { background-position: 0% 0%, 100% 0%, 50% 100%; }
+  50%     { background-position: 100% 100%, 0% 100%, 50% 0%; }
+}
+
+/* Glass card */
+.landing-glass {
+  background: rgba(17,24,39,0.65);
+  border: 1px solid var(--lp-border-2);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+.landing-glass-hover:hover {
+  transform: translateY(-4px);
+  border-color: rgba(59,130,246,0.55);
+  box-shadow: 0 18px 48px rgba(59,130,246,0.18);
+}
+
+/* CTA pulse */
+.landing-cta {
+  background: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%);
+  box-shadow: 0 0 30px rgba(59,130,246,0.40);
+  animation: lp-pulse 2.6s ease-in-out infinite;
+}
+.landing-cta-success {
+  background: linear-gradient(135deg, #059669 0%, #10B981 100%);
+  box-shadow: 0 0 22px rgba(16,185,129,0.35);
+}
+@keyframes lp-pulse {
+  0%,100% { box-shadow: 0 0 30px rgba(59,130,246,0.40); }
+  50%     { box-shadow: 0 0 46px rgba(96,165,250,0.65); }
+}
+
+/* WhatsApp FAB */
+.landing-fab {
+  background: #25D366;
+  box-shadow: 0 4px 20px rgba(37,211,102,0.45);
+  animation: lp-fab-pulse 2.2s ease-in-out infinite;
+}
+@keyframes lp-fab-pulse {
+  0%,100% { box-shadow: 0 4px 20px rgba(37,211,102,0.45), 0 0 0 0 rgba(37,211,102,0.45); }
+  50%     { box-shadow: 0 4px 20px rgba(37,211,102,0.45), 0 0 0 14px rgba(37,211,102,0.0); }
+}
+
+/* Slider thumb glow */
+.landing-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  background: transparent;
+}
+.landing-range::-webkit-slider-runnable-track {
+  height: 8px; border-radius: 9999px;
+  background: linear-gradient(to right, #3B82F6 var(--p,50%), rgba(255,255,255,0.10) var(--p,50%));
+}
+.landing-range::-moz-range-track {
+  height: 8px; border-radius: 9999px;
+  background: linear-gradient(to right, #3B82F6 var(--p,50%), rgba(255,255,255,0.10) var(--p,50%));
+}
+.landing-range::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 24px; height: 24px; margin-top: -8px;
+  background: #fff; border: 3px solid #3B82F6; border-radius: 9999px;
+  box-shadow: 0 0 0 6px rgba(59,130,246,0.18), 0 0 16px rgba(59,130,246,0.55);
+  cursor: pointer;
+}
+.landing-range::-moz-range-thumb {
+  width: 24px; height: 24px;
+  background: #fff; border: 3px solid #3B82F6; border-radius: 9999px;
+  box-shadow: 0 0 0 6px rgba(59,130,246,0.18), 0 0 16px rgba(59,130,246,0.55);
+  cursor: pointer;
+}
+
+/* Bounce indicator */
+@keyframes lp-bounce {
+  0%,100% { transform: translateY(0); opacity: .55; }
+  50%     { transform: translateY(6px); opacity: 1; }
+}
+.landing-bounce { animation: lp-bounce 1.8s ease-in-out infinite; }
+
+/* Snap scroll proceso */
+.landing-snap { scroll-snap-type: x mandatory; }
+.landing-snap > * { scroll-snap-align: start; }
+
+/* Hero stat number gradient */
+.landing-num-blue   { color: #60A5FA; }
+.landing-num-green  { color: #10B981; }
+.landing-num-amber  { color: #F59E0B; }
+.landing-num-pink   { color: #EC4899; }
+
+/* Mockup 3D del PDF */
+.landing-mockup {
+  transform: perspective(1400px) rotateY(-14deg) rotateX(6deg);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.55), 0 0 60px rgba(59,130,246,0.15);
+  transition: transform .5s ease;
+}
+.landing-mockup:hover {
+  transform: perspective(1400px) rotateY(-6deg) rotateX(2deg);
+}
+
 

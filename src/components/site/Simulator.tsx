@@ -1,223 +1,197 @@
-import { useMemo, useState } from "react";
-import { ArrowRight, TrendingUp, Calendar, Wallet } from "lucide-react";
-import {
-  buildSimulationTable,
-  calculateMonthlyPayment,
-  formatMXN,
-  type TermYears,
-} from "@/lib/finance";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ArrowRight, Sparkles, TrendingDown, Calendar, Percent, Wallet } from "lucide-react";
+import { calculateMonthlyPayment, formatMXN, type TermYears } from "@/lib/finance";
 import { BRAND, INSTITUTION } from "@/lib/config";
 
 const TERMS: TermYears[] = [2, 4, 6, 8];
 const MIN = 10000;
 const MAX = 250000;
-const QUICK = [10000, 25000, 50000, 100000, 150000, 250000];
+const STEP = 10000;
+
+function useCountUp(target: number, duration = 600) {
+  const [value, setValue] = useState(target);
+  const fromRef = useRef(target);
+  useEffect(() => {
+    const from = fromRef.current;
+    const start = performance.now();
+    let raf = 0;
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setValue(Math.round(from + (target - from) * eased));
+      if (t < 1) raf = requestAnimationFrame(tick);
+      else fromRef.current = target;
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, duration]);
+  return value;
+}
 
 export function Simulator() {
   const [amount, setAmount] = useState(50000);
   const [years, setYears] = useState<TermYears>(4);
 
-  const payment = useMemo(() => calculateMonthlyPayment(amount, years), [amount, years]);
-  const rows = useMemo(() => buildSimulationTable(amount), [amount]);
+  const { cuota, total, months, intereses } = useMemo(() => {
+    const p = calculateMonthlyPayment(amount, years);
+    return { ...p, intereses: p.total - amount };
+  }, [amount, years]);
+
+  const cuotaA = useCountUp(cuota);
+  const totalA = useCountUp(total);
+
+  // Ahorro vs banco tradicional (~12% anual)
+  const bankRate = 0.12;
+  const months12 = years * 12;
+  const r12 = bankRate / 12;
+  const cuotaBanco =
+    (amount * r12) / (1 - Math.pow(1 + r12, -months12));
+  const ahorro = Math.max(0, Math.round(cuotaBanco * months12 - total));
+
   const percent = ((amount - MIN) / (MAX - MIN)) * 100;
 
   const whatsappMsg = encodeURIComponent(
-    `Hola, realicé una simulación en ImpulsoGo:\n\nMonto: ${formatMXN(amount)}\nPlazo: ${years} años\nCuota estimada: ${formatMXN(payment.cuota)}\n\nQuiero recibir información sobre el proceso.`,
+    `Hola, simulé en Impulso Go:\n\nMonto: ${formatMXN(amount)}\nPlazo: ${years} años\nCuota: ${formatMXN(cuota)}\nTotal: ${formatMXN(total)}\n\nQuiero continuar mi solicitud.`,
   );
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-finance">
-      {/* Header */}
-      <div className="gradient-brand px-6 py-5 text-white sm:px-8">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-[11px] font-black uppercase tracking-[0.18em] text-white/75">
-              Simulador financiero
-            </p>
-            <h3 className="mt-1.5 text-2xl font-black tracking-tight">
-              Calcula una referencia clara
-            </h3>
-          </div>
-          <span className="w-max rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-bold backdrop-blur">
-            {INSTITUTION.annualRatePercent}.00% anual fija
+    <div className="landing-glass mx-auto max-w-3xl rounded-3xl p-6 sm:p-8">
+      <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[#60A5FA]">
+        <Sparkles className="h-3.5 w-3.5" />
+        Simulador interactivo
+      </div>
+      <h3 className="display mt-2 text-2xl font-extrabold text-white sm:text-3xl">
+        Calcula tu crédito
+      </h3>
+      <p className="mt-1 text-sm text-[#9CA3AF]">
+        Tasa anual fija {INSTITUTION.annualRatePercent}% · sin sorpresas
+      </p>
+
+      {/* Monto */}
+      <div className="mt-6">
+        <div className="flex items-end justify-between">
+          <label className="text-sm font-semibold text-[#D1D5DB]" htmlFor="lp-amount">
+            Monto del crédito
+          </label>
+          <span className="text-xs font-medium text-[#9CA3AF]">
+            {formatMXN(MIN)} — {formatMXN(MAX)}
           </span>
         </div>
+        <p className="display mt-3 text-center text-4xl font-extrabold tracking-tight text-white tabular-nums sm:text-5xl">
+          {formatMXN(amount)}
+        </p>
+        <input
+          id="lp-amount"
+          type="range"
+          min={MIN}
+          max={MAX}
+          step={STEP}
+          value={amount}
+          onChange={(e) => setAmount(Number(e.target.value))}
+          className="landing-range mt-4"
+          style={{ ["--p" as never]: `${percent}%` }}
+        />
       </div>
 
-      <div className="grid gap-0 lg:grid-cols-[1fr_1.05fr]">
-        {/* Inputs */}
-        <div className="space-y-7 p-6 sm:p-8">
-          <div>
-            <div className="flex items-end justify-between gap-3">
-              <label className="text-sm font-bold text-foreground" htmlFor="sim-amount">
-                Monto del crédito
-              </label>
-              <input
-                id="sim-amount"
-                type="number"
-                min={MIN}
-                max={MAX}
-                step={5000}
-                value={amount}
-                onChange={(e) => {
-                  const v = Math.min(MAX, Math.max(MIN, Number(e.target.value) || MIN));
-                  setAmount(Math.round(v / 5000) * 5000);
-                }}
-                className="h-10 w-32 rounded-md border border-border px-3 text-right text-sm font-black text-institutional outline-none focus:border-action focus:ring-2 focus:ring-action/20"
-              />
-            </div>
-            <p className="mt-4 text-center text-5xl font-black tracking-tight text-institutional tabular-nums">
-              {formatMXN(amount)}
-            </p>
-
-            <div className="relative mt-6 h-2.5 rounded-full bg-secondary">
-              <div
-                className="h-full rounded-full gradient-brand transition-[width] duration-150"
-                style={{ width: `${percent}%` }}
-              />
-              <input
-                aria-label="Monto"
-                type="range"
-                min={MIN}
-                max={MAX}
-                step={5000}
-                value={amount}
-                onChange={(e) => setAmount(Number(e.target.value))}
-                className="absolute inset-0 h-2.5 w-full cursor-pointer opacity-0"
-              />
-            </div>
-            <div className="mt-2 flex justify-between text-xs font-semibold text-muted-foreground">
-              <span>{formatMXN(MIN)}</span>
-              <span>{formatMXN(MAX)}</span>
-            </div>
-
-            <div className="mt-5 grid grid-cols-3 gap-2">
-              {QUICK.map((v) => (
-                <button
-                  key={v}
-                  type="button"
-                  onClick={() => setAmount(v)}
-                  className={`h-10 rounded-md border px-2 text-xs font-bold transition ${
-                    amount === v
-                      ? "border-action bg-surface text-action"
-                      : "border-border bg-card text-muted-foreground hover:border-action/40 hover:text-foreground"
-                  }`}
-                >
-                  {formatMXN(v)}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <label className="text-sm font-bold text-foreground">Plazo</label>
-            <div className="mt-3 grid grid-cols-4 gap-2">
-              {TERMS.map((t) => (
-                <button
-                  key={t}
-                  type="button"
-                  onClick={() => setYears(t)}
-                  className={`h-12 rounded-md text-sm font-black transition ${
-                    years === t
-                      ? "bg-institutional text-white shadow-card-soft"
-                      : "bg-secondary text-foreground hover:bg-surface"
-                  }`}
-                >
-                  {t} años
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Results */}
-        <div className="border-t border-border bg-surface-alt p-6 sm:p-8 lg:border-l lg:border-t-0">
-          <div className="rounded-xl border border-border bg-card p-5 shadow-card-soft">
-            <Row icon={<Wallet className="h-4 w-4" />} label="Cuota mensual estimada">
-              <strong className="text-3xl font-black text-institutional tabular-nums">
-                {formatMXN(payment.cuota)}
-              </strong>
-            </Row>
-            <hr className="my-4 border-border" />
-            <Row icon={<TrendingUp className="h-4 w-4" />} label="Total estimado a pagar">
-              <strong className="text-lg font-bold text-success tabular-nums">
-                {formatMXN(payment.total)}
-              </strong>
-            </Row>
-            <hr className="my-4 border-border" />
-            <Row icon={<Calendar className="h-4 w-4" />} label="Plazo total">
-              <strong className="text-base font-bold text-institutional">
-                {payment.months} meses
-              </strong>
-            </Row>
-          </div>
-
-          <div className="mt-5 overflow-hidden rounded-xl border border-border bg-card">
-            <div className="grid grid-cols-[0.7fr_1fr_1fr] bg-institutional text-center text-[10px] font-black uppercase tracking-[0.14em] text-white">
-              <div className="px-3 py-3">Plazo</div>
-              <div className="border-l border-white/10 px-3 py-3">Cuota</div>
-              <div className="border-l border-white/10 px-3 py-3">Total</div>
-            </div>
-            {rows.map((r) => {
-              const active = r.years === years;
-              return (
-                <button
-                  key={r.years}
-                  type="button"
-                  onClick={() => setYears(r.years as TermYears)}
-                  className={`grid w-full grid-cols-[0.7fr_1fr_1fr] border-t border-border text-center text-sm transition ${
-                    active ? "bg-surface" : "hover:bg-surface-alt"
-                  }`}
-                >
-                  <div className={`px-3 py-3 font-bold ${active ? "text-action" : "text-foreground"}`}>
-                    {r.years} años
-                  </div>
-                  <div className="border-l border-border px-3 py-3 font-bold tabular-nums text-foreground">
-                    {formatMXN(r.cuota)}
-                  </div>
-                  <div className="border-l border-border px-3 py-3 font-semibold tabular-nums text-muted-foreground">
-                    {formatMXN(r.total)}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-
-          <a
-            href={`${BRAND.whatsappUrl}&text=${whatsappMsg}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-5 inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-[#25D366] px-5 text-sm font-bold text-white shadow-card-soft transition hover:bg-[#1fb957]"
-          >
-            Continuar por WhatsApp
-            <ArrowRight className="h-4 w-4" />
-          </a>
-          <p className="mt-3 text-center text-[11px] leading-relaxed text-muted-foreground">
-            La simulación es referencial. Toda operación está sujeta a evaluación
-            crediticia y formalización contractual.
-          </p>
+      {/* Plazo */}
+      <div className="mt-6">
+        <label className="text-sm font-semibold text-[#D1D5DB]">Plazo</label>
+        <div className="mt-2 grid grid-cols-4 gap-2">
+          {TERMS.map((t) => {
+            const active = years === t;
+            return (
+              <button
+                key={t}
+                type="button"
+                onClick={() => setYears(t)}
+                className={`h-12 rounded-xl border text-sm font-bold transition ${
+                  active
+                    ? "border-transparent bg-[#3B82F6] text-white shadow-[0_0_18px_rgba(59,130,246,0.45)]"
+                    : "border-white/10 bg-white/[0.04] text-[#D1D5DB] hover:border-white/25 hover:text-white"
+                }`}
+              >
+                {t} años
+              </button>
+            );
+          })}
         </div>
       </div>
+
+      <div className="my-6 border-t border-white/10" />
+
+      {/* Resultados grid 2/4 */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <ResultCard
+          icon={<Wallet className="h-4 w-4" />}
+          label="Cuota mensual"
+          value={formatMXN(cuotaA)}
+          color="text-[#10B981]"
+        />
+        <ResultCard
+          icon={<TrendingDown className="h-4 w-4" />}
+          label="Total a pagar"
+          value={formatMXN(totalA)}
+          color="text-white"
+        />
+        <ResultCard
+          icon={<Calendar className="h-4 w-4" />}
+          label="Plazo"
+          value={`${months} meses`}
+          color="text-white"
+          size="sm"
+        />
+        <ResultCard
+          icon={<Percent className="h-4 w-4" />}
+          label="Tasa"
+          value={`${INSTITUTION.annualRatePercent}%`}
+          color="text-[#F59E0B]"
+          size="sm"
+        />
+      </div>
+
+      {/* Comparador */}
+      <div className="mt-4 rounded-xl border border-[rgba(245,158,11,0.35)] bg-[rgba(245,158,11,0.10)] p-3 text-sm text-[#FDE68A]">
+        💡 <span className="font-semibold">Vs bancos tradicionales (~12% anual):</span> ahorro estimado{" "}
+        <span className="font-bold text-white">{formatMXN(ahorro)}</span>{" "}
+        <span className="text-[#9CA3AF]">· intereses {formatMXN(intereses)}</span>
+      </div>
+
+      <p className="mt-3 text-xs text-[#6B7280]">
+        Simulación referencial. Sujeto a evaluación crediticia y formalización contractual.
+      </p>
+
+      <a
+        href={`${BRAND.whatsappUrl}&text=${whatsappMsg}&utm_source=landing&utm_medium=simulator&utm_campaign=cta`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="landing-cta-success mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl px-5 text-sm font-bold text-white transition hover:opacity-95"
+      >
+        Continuar solicitud por WhatsApp
+        <ArrowRight className="h-4 w-4" />
+      </a>
     </div>
   );
 }
 
-function Row({
-  icon,
-  label,
-  children,
+function ResultCard({
+  icon, label, value, color, size = "md",
 }: {
-  icon: React.ReactNode;
-  label: string;
-  children: React.ReactNode;
+  icon: React.ReactNode; label: string; value: string;
+  color: string; size?: "sm" | "md";
 }) {
   return (
-    <div className="flex items-center justify-between gap-4">
-      <span className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground">
-        <span className="text-action">{icon}</span>
+    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+      <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#9CA3AF]">
+        <span className="text-[#60A5FA]">{icon}</span>
         {label}
       </span>
-      {children}
+      <p
+        className={`mt-2 font-extrabold tabular-nums tracking-tight ${color} ${
+          size === "sm" ? "text-lg" : "text-2xl sm:text-3xl"
+        }`}
+      >
+        {value}
+      </p>
     </div>
   );
 }
