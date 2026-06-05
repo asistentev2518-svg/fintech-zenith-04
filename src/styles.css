@@ -58,6 +58,7 @@
   --color-sidebar-ring: var(--sidebar-ring);
 
   --font-sans: "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-display: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
 }
 
 :root {
