@@ -1,11 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import QRCode from "qrcode";
-import { X, Download, ExternalLink, FileText, Loader2, Image as ImageIcon } from "lucide-react";
+import { X, Download, ExternalLink, FileText, Loader2 } from "lucide-react";
 import type { SignedContract } from "@/lib/contracts";
-import { ContractDocument } from "./ContractDocument";
-import { ContractCardInstitutional } from "./ContractCardInstitutional";
-import { exportNodeToPdf } from "@/lib/pdf-export";
-import { exportNodeToPng } from "@/lib/png-export";
+import { exportSignedContractPdf } from "@/lib/contract-pdf";
 import { formatMXN } from "@/lib/finance";
 
 interface Props {
@@ -14,10 +11,8 @@ interface Props {
 }
 
 export function ContractDetailModal({ contract, onClose }: Props) {
-  const docRef = useRef<HTMLDivElement>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
   const [qr, setQr] = useState<string>("");
-  const [busy, setBusy] = useState<"pdf" | "png" | null>(null);
+  const [busy, setBusy] = useState<"pdf" | null>(null);
 
   useEffect(() => {
     if (!contract) return;
@@ -28,20 +23,9 @@ export function ContractDetailModal({ contract, onClose }: Props) {
   if (!contract) return null;
 
   const reexport = async () => {
-    if (!docRef.current) return;
     setBusy("pdf");
     try {
-      await exportNodeToPdf(docRef.current, `contrato-${contract.folio}.pdf`);
-    } finally {
-      setBusy(null);
-    }
-  };
-
-  const exportPng = async () => {
-    if (!cardRef.current) return;
-    setBusy("png");
-    try {
-      await exportNodeToPng(cardRef.current, `contrato-${contract.folio}.png`, 1080, 1350);
+      await exportSignedContractPdf(contract);
     } finally {
       setBusy(null);
     }
