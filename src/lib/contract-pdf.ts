@@ -398,3 +398,156 @@ export async function exportManualContractPdf(input: {
   const surname = input.fullName.trim().split(/\s+/).pop() ?? "cliente";
   doc.save(fileName(input.folio, surname));
 }
+
+// ============================================================
+// Editor manual /contrato — PDF vectorial 3 páginas
+// ============================================================
+export interface ContratoEditorInput {
+  folio: string;
+  fullName: string;
+  curp: string;
+  sexo: string;
+  phone: string;
+  income: string;
+  address: string;
+  clauses: {
+    declaraciones: string;
+    primera: string;
+    segunda: string;
+    tercera: string;
+    cuarta: string;
+    quinta: string;
+    sexta: string;
+    septima: string;
+    octava: string;
+    declaracionFinal: string;
+  };
+}
+
+export async function exportContratoEditorPdf(s: ContratoEditorInput): Promise<void> {
+  const doc = new jsPDF({ unit: "mm", format: "letter", compress: true, putOnlyUsedFonts: true });
+  const w = doc.internal.pageSize.getWidth();
+  const pageRef = { page: 1, total: 1 };
+  const common: CommonInput = {
+    folio: s.folio,
+    fullName: s.fullName || "—",
+    curp: s.curp,
+    phone: s.phone,
+    address: s.address,
+    amount: 0,
+    termYears: 2 as TermYears,
+    signedAt: new Date().toISOString(),
+  };
+
+  header(doc, common, pageRef.page, pageRef.total);
+  let y = TOP_BODY;
+
+  doc.setTextColor(...BRAND);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(15);
+  doc.text("CONTRATO DE CRÉDITO Y OTORGAMIENTO DE FINANCIAMIENTO", w / 2, y, { align: "center", maxWidth: w - 30 });
+  y += 10;
+
+  y = sectionTitle(doc, "1. DATOS DEL CLIENTE", y, common, pageRef);
+  autoTable(doc, {
+    startY: y,
+    body: [
+      ["Nombre completo", s.fullName || "—"],
+      ["CURP", s.curp || "—"],
+      ["Sexo", s.sexo || "—"],
+      ["Teléfono", s.phone || "—"],
+      ["Ingresos mensuales", s.income || "—"],
+      ["Domicilio", s.address || "—"],
+    ],
+    styles: { font: "helvetica", fontSize: 9, cellPadding: 2.5, textColor: INK },
+    columnStyles: { 0: { fontStyle: "bold", cellWidth: 50, fillColor: BG_SOFT }, 1: {} },
+    theme: "grid",
+    margin: { left: MARGIN_X, right: MARGIN_X },
+    didDrawPage: () => header(doc, common, pageRef.page, pageRef.total),
+  });
+  // @ts-expect-error
+  y = (doc.lastAutoTable?.finalY ?? y) + 6;
+
+  y = sectionTitle(doc, "2. DATOS DEL FINANCIAMIENTO (LLENADO MANUAL)", y, common, pageRef);
+  autoTable(doc, {
+    startY: y,
+    body: [
+      ["Monto solicitado", "____________________"],
+      ["Tasa anual ordinaria fija", `${INSTITUTION.annualRatePercent}%`],
+      ["Plazo en años", "____________________"],
+      ["Fecha de otorgamiento", "____ / ____ / ________"],
+      ["Fecha estimada de vencimiento", "____ / ____ / ________"],
+      ["Cuenta a acreditar", "____________________"],
+      ["Nombre del banco", "____________________"],
+    ],
+    styles: { font: "helvetica", fontSize: 9, cellPadding: 2.5, textColor: INK },
+    columnStyles: { 0: { fontStyle: "bold", cellWidth: 60, fillColor: BG_SOFT }, 1: {} },
+    theme: "grid",
+    margin: { left: MARGIN_X, right: MARGIN_X },
+    didDrawPage: () => header(doc, common, pageRef.page, pageRef.total),
+  });
+  // @ts-expect-error
+  y = (doc.lastAutoTable?.finalY ?? y) + 8;
+
+  y = sectionTitle(doc, "DECLARACIONES", y, common, pageRef);
+  y = paragraph(doc, s.clauses.declaraciones, y, common, pageRef);
+
+  const items: [string, string][] = [
+    ["PRIMERA. PAGOS", s.clauses.primera],
+    ["SEGUNDA. DOMICILIOS Y MEDIOS DE CONTACTO", s.clauses.segunda],
+    ["TERCERA. INFORMACIÓN CREDITICIA", s.clauses.tercera],
+    ["CUARTA. COSTO ANUAL TOTAL (CAT)", s.clauses.cuarta],
+    ["QUINTA. VERIFICACIÓN Y VALIDACIÓN DIGITAL", s.clauses.quinta],
+    ["SEXTA. COMISIONES DE PAGO", s.clauses.sexta],
+    ["SÉPTIMA. CANCELACIÓN Y PENALIZACIÓN", s.clauses.septima],
+    ["OCTAVA. ACEPTACIÓN, LEGISLACIÓN Y JURISDICCIÓN", s.clauses.octava],
+  ];
+  y = sectionTitle(doc, "CLÁUSULAS", y + 2, common, pageRef);
+  for (const [title, body] of items) {
+    y = ensureSpace(doc, y, 12, common, pageRef);
+    doc.setTextColor(...BRAND);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.text(title, MARGIN_X, y);
+    y += 4.6;
+    y = paragraph(doc, body, y, common, pageRef);
+    y += 1.5;
+  }
+  y = paragraph(doc, s.clauses.declaracionFinal, y + 2, common, pageRef, { bold: true });
+
+  // Firma manual
+  y = ensureSpace(doc, y, 50, common, pageRef);
+  y += 4;
+  const colW = (w - MARGIN_X * 2 - 10) / 2;
+  [0, 1].forEach((i) => {
+    const x = MARGIN_X + i * (colW + 10);
+    doc.setDrawColor(...HAIRLINE);
+    doc.rect(x, y, colW, 40);
+    doc.setTextColor(...BRAND);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.text(i === 0 ? "FIRMA DEL CLIENTE" : "FIRMA DEL REPRESENTANTE LEGAL", x + colW / 2, y + 5, { align: "center" });
+    doc.setDrawColor(...INK);
+    doc.line(x + 4, y + 30, x + colW - 4, y + 30);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(...INK);
+    doc.text(i === 0 ? (s.fullName || "____________________") : INSTITUTION.representative, x + colW / 2, y + 34, { align: "center" });
+    doc.setTextColor(...INK_SOFT);
+    doc.setFontSize(7);
+    doc.text(i === 0 ? "Fecha: ___/___/______" : INSTITUTION.representativeTitle, x + colW / 2, y + 37.5, { align: "center" });
+  });
+
+  // Re-numerar
+  const total = doc.getNumberOfPages();
+  for (let p = 1; p <= total; p++) {
+    doc.setPage(p);
+    doc.setFillColor(255, 255, 255);
+    doc.rect(0, 0, w, 19.2, "F");
+    header(doc, common, p, total);
+    footer(doc, common);
+  }
+
+  const surname = s.fullName.trim().split(/\s+/).pop() ?? "cliente";
+  doc.save(fileName(s.folio, surname));
+}
