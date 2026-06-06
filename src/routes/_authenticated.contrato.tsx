@@ -3,7 +3,7 @@ import { forwardRef, useRef, useState } from "react";
 import { Download, Loader2, FileEdit } from "lucide-react";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { INSTITUTION, ASSETS } from "@/lib/config";
-import { exportNodeToPng } from "@/lib/png-export";
+import { exportContratoEditorPdf } from "@/lib/contract-pdf";
 
 export const Route = createFileRoute("/_authenticated/contrato")({
   head: () => ({
@@ -61,17 +61,15 @@ function defaultState(): State {
 
 function ContratoEditorPage() {
   const [s, setS] = useState<State>(defaultState);
-  const [busy, setBusy] = useState<number | null>(null);
+  const [busy, setBusy] = useState<boolean>(false);
   const refs = [useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null)];
 
-  const exportPage = async (page: number) => {
-    const node = refs[page - 1].current;
-    if (!node) return;
-    setBusy(page);
+  const exportPdf = async () => {
+    setBusy(true);
     try {
-      await exportNodeToPng(node, `contrato-${s.folio}-pagina-${page}.png`, 1080, 1500);
+      await exportContratoEditorPdf(s);
     } finally {
-      setBusy(null);
+      setBusy(false);
     }
   };
 
@@ -124,7 +122,19 @@ function ContratoEditorPage() {
           </details>
         </section>
 
-        {/* Páginas */}
+        {/* Acción global */}
+        <div className="flex justify-end">
+          <button
+            onClick={exportPdf}
+            disabled={busy || !s.fullName}
+            className="inline-flex items-center gap-2 rounded-md gradient-brand px-5 py-2.5 text-sm font-bold text-white shadow-card-soft disabled:opacity-50"
+          >
+            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+            Descargar contrato PDF (3 páginas)
+          </button>
+        </div>
+
+        {/* Páginas (vista previa) */}
         <section className="grid gap-6 lg:grid-cols-3">
           {[1, 2, 3].map((p) => (
             <article key={p} className="overflow-hidden rounded-2xl border border-border bg-card shadow-card-soft">
@@ -132,13 +142,10 @@ function ContratoEditorPage() {
                 <div className="flex items-center gap-2">
                   <span className="grid h-9 w-9 place-items-center rounded-md gradient-brand text-white"><FileEdit className="h-4 w-4" /></span>
                   <div>
-                    <h3 className="text-sm font-black text-institutional">Página {p} de 3</h3>
-                    <p className="text-[11px] text-muted-foreground">1080 × 1500 px · PNG</p>
+                    <h3 className="text-sm font-black text-institutional">Vista previa · Página {p} de 3</h3>
+                    <p className="text-[11px] text-muted-foreground">PDF vectorial · texto seleccionable</p>
                   </div>
                 </div>
-                <button onClick={() => exportPage(p)} disabled={busy === p || !s.fullName} className="inline-flex items-center gap-1.5 rounded-md gradient-brand px-3 py-2 text-xs font-bold text-white shadow-card-soft disabled:opacity-50">
-                  {busy === p ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}PNG
-                </button>
               </header>
               <div className="overflow-auto bg-surface-alt p-3" style={{ maxHeight: 520 }}>
                 <div style={{ transform: "scale(0.36)", transformOrigin: "top left", width: 1080, height: 1500 }}>

@@ -1,10 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import QRCode from "qrcode";
 import { CheckCircle2, Download, Home, ShieldCheck, ExternalLink, Loader2 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import type { SignedContract } from "@/lib/contracts";
-import { ContractDocument } from "./ContractDocument";
-import { exportNodeToPdf } from "@/lib/pdf-export";
+import { exportSignedContractPdf } from "@/lib/contract-pdf";
 import { formatMXN } from "@/lib/finance";
 
 interface Props {
@@ -14,7 +13,6 @@ interface Props {
 export function StepConfirmacion({ contract }: Props) {
   const [qr, setQr] = useState<string>("");
   const [exporting, setExporting] = useState(false);
-  const docRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const url = `${window.location.origin}/validar/${contract.folio}`;
@@ -24,10 +22,9 @@ export function StepConfirmacion({ contract }: Props) {
   }, [contract.folio]);
 
   const downloadPdf = async () => {
-    if (!docRef.current) return;
     setExporting(true);
     try {
-      await exportNodeToPdf(docRef.current, `Contrato-${contract.folio}.pdf`);
+      await exportSignedContractPdf(contract);
     } finally {
       setExporting(false);
     }
@@ -112,11 +109,6 @@ export function StepConfirmacion({ contract }: Props) {
         <ShieldCheck className="h-3.5 w-3.5 text-success" />
         Expediente conservado como mensaje de datos conforme a la legislación aplicable.
       </p>
-
-      {/* Render fuera de pantalla para html2canvas */}
-      <div style={{ position: "fixed", left: "-10000px", top: 0, zIndex: -1 }} aria-hidden>
-        <ContractDocument ref={docRef} contract={contract} qrDataUrl={qr || undefined} />
-      </div>
     </div>
   );
 }
