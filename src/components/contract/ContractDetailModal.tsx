@@ -89,28 +89,14 @@ export function ContractDetailModal({ contract, onClose }: Props) {
             Cerrar
           </button>
           <button
-            onClick={exportPng}
-            disabled={busy !== null}
-            className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-4 py-2 text-sm font-bold text-institutional hover:bg-accent disabled:opacity-60"
-          >
-            {busy === "png" ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImageIcon className="h-4 w-4" />}
-            Exportar PNG
-          </button>
-          <button
             onClick={reexport}
             disabled={busy !== null}
             className="inline-flex items-center gap-2 rounded-md gradient-brand px-4 py-2 text-sm font-bold text-white shadow-card-soft disabled:opacity-60"
           >
             {busy === "pdf" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-            Reexportar PDF
+            Descargar PDF
           </button>
         </footer>
-
-        {/* Hidden render targets for html2canvas */}
-        <div style={{ position: "fixed", left: -10000, top: 0 }} aria-hidden>
-          <ContractDocument ref={docRef} contract={contract} qrDataUrl={qr || undefined} />
-          <ContractCardInstitutional ref={cardRef} contract={contract} qrDataUrl={qr || undefined} />
-        </div>
       </div>
     </div>
   );
