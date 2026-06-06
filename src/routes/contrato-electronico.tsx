@@ -7,7 +7,7 @@ import { Printer, Download, FileText, Loader2, ArrowLeft } from "lucide-react";
 import { PublicHeader } from "@/components/site/PublicHeader";
 import { PublicFooter } from "@/components/site/PublicFooter";
 import { ContractManualDocument, type ManualContractInput } from "@/components/contract/ContractManualDocument";
-import { exportNodeToPdf } from "@/lib/pdf-export";
+import { exportManualContractPdf } from "@/lib/contract-pdf";
 import { generateFolio } from "@/lib/contracts";
 import { formatMXN, type TermYears } from "@/lib/finance";
 import { INSTITUTION } from "@/lib/config";
@@ -60,10 +60,10 @@ function ContratoElectronicoPage() {
   });
 
   const downloadPdf = async () => {
-    if (!docRef.current) return;
+    if (!doc) return;
     setBusy(true);
     try {
-      await exportNodeToPdf(docRef.current, `contrato-electronico-${doc?.folio}.pdf`);
+      await exportManualContractPdf(doc);
     } finally {
       setBusy(false);
     }
